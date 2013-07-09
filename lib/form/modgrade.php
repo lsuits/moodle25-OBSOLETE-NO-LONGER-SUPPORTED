@@ -86,7 +86,7 @@ class MoodleQuickForm_modgrade extends MoodleQuickForm_select{
                 if (!$this->_hidenograde) {
                     $grades[0] = get_string('nograde');
                 }
-                for ($i=100; $i>=1; $i--) {
+                for ($i=500; $i>=1; $i--) {
                     $grades[$i] = $i;
                 }
                 $this->load($grades);
