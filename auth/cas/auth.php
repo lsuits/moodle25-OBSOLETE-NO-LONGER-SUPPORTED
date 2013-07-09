@@ -60,6 +60,10 @@ class auth_plugin_cas extends auth_plugin_ldap {
      * @return bool Authentication success or failure.
      */
     function user_login ($username, $password) {
+        if (strpos($username, '@')) {
+            print_error('auth_cas_myproxy_login', 'auth_cas');
+        }
+
         $this->connectCAS();
         return phpCAS::isAuthenticated() && (trim(textlib::strtolower(phpCAS::getUser())) == $username);
     }
@@ -465,7 +469,12 @@ class auth_plugin_cas extends auth_plugin_ldap {
         if (empty($this->config->host_url)) {
             return array();
         }
-        return parent::get_userinfo($username);
+        global $DB;
+        $conditions = array('username' => $username);
+        $user = $DB->get_record('user', $conditions);
+        if (!isset($user->firstname)) {
+            return parent::get_userinfo($username);
+        }
     }
 
     /**
