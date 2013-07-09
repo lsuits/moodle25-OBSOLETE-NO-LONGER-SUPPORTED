@@ -123,7 +123,7 @@ class accesslib_testcase extends advanced_testcase {
      * @return void
      */
     public function test_is_siteadmin() {
-        global $DB;
+        global $DB, $CFG;
 
         $this->resetAfterTest();
 
@@ -145,6 +145,20 @@ class accesslib_testcase extends advanced_testcase {
                 $this->assertFalse(is_siteadmin(null));
             }
         }
+
+        // Change the site admin list and check that it still works with
+        // multiple admins. We do this with userids only (not real user
+        // accounts) because it makes the test simpler.
+        $before = $CFG->siteadmins;
+        set_config('siteadmins', '666,667,668');
+        $this->assertTrue(is_siteadmin(666));
+        $this->assertTrue(is_siteadmin(667));
+        $this->assertTrue(is_siteadmin(668));
+        $this->assertFalse(is_siteadmin(669));
+        set_config('siteadmins', '13');
+        $this->assertTrue(is_siteadmin(13));
+        $this->assertFalse(is_siteadmin(666));
+        set_config('siteadmins', $before);
     }
 
     /**
@@ -806,6 +820,45 @@ class accesslib_testcase extends advanced_testcase {
                 $this->assertSame($name, $rolename);
             }
         }
+    }
+
+    /**
+     * Test role default allows.
+     */
+    public function test_get_default_role_archetype_allows() {
+        $archetypes = get_role_archetypes();
+        foreach ($archetypes as $archetype) {
+
+            $result = get_default_role_archetype_allows('assign', $archetype);
+            $this->assertTrue(is_array($result));
+
+            $result = get_default_role_archetype_allows('override', $archetype);
+            $this->assertTrue(is_array($result));
+
+            $result = get_default_role_archetype_allows('switch', $archetype);
+            $this->assertTrue(is_array($result));
+        }
+
+        $result = get_default_role_archetype_allows('assign', '');
+        $this->assertSame(array(), $result);
+
+        $result = get_default_role_archetype_allows('override', '');
+        $this->assertSame(array(), $result);
+
+        $result = get_default_role_archetype_allows('switch', '');
+        $this->assertSame(array(), $result);
+
+        $result = get_default_role_archetype_allows('assign', 'wrongarchetype');
+        $this->assertSame(array(), $result);
+        $this->assertDebuggingCalled();
+
+        $result = get_default_role_archetype_allows('override', 'wrongarchetype');
+        $this->assertSame(array(), $result);
+        $this->assertDebuggingCalled();
+
+        $result = get_default_role_archetype_allows('switch', 'wrongarchetype');
+        $this->assertSame(array(), $result);
+        $this->assertDebuggingCalled();
     }
 
     /**
@@ -2313,6 +2366,12 @@ class accesslib_testcase extends advanced_testcase {
         $this->resetDebugging();
         $this->assertEquals(count($children), $DB->count_records('context')-1);
         unset($children);
+
+        // Make sure a debugging is thrown.
+        get_context_instance($record->contextlevel, $record->instanceid);
+        $this->assertDebuggingCalled('get_context_instance() is deprecated, please use context_xxxx::instance() instead.', DEBUG_DEVELOPER);
+        get_context_instance_by_id($record->id);
+        $this->assertDebuggingCalled('get_context_instance_by_id() is deprecated, please use context::instance_by_id($id) instead.', DEBUG_DEVELOPER);
 
         $DB->delete_records('context', array('contextlevel'=>CONTEXT_BLOCK));
         create_contexts();
