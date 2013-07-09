@@ -63,14 +63,62 @@ function cron_run() {
     $timenow  = time();
     mtrace("Server Time: ".date('r', $timenow)."\n\n");
 
+    // Delete old logs to save space via a timer
+    mtrace("Running clean-up tasks");
+    mtrace("  Running logs clean-up task");
+    
+    if(!isset($CFG->loglifetime)){
+        mtrace(sprintf("\n    [WARNING] No value set for '%s'...aborting logs history pruning.\n"
+             ,get_string('loglifetime', 'admin')
+             ));        
+    }elseif($CFG->loglifetime == 0){
+        mtrace(sprintf("\n    [INFO] Config '%s' is set to '%s'...skipping logs history pruning.\n", 
+                get_string('loglifetime', 'admin'),
+                get_string('neverdeletelogs', 'admin')
+                ));        
+    }else{
+    
+        mtrace(sprintf("    Logs retention policy is set for %s days; checking for appropriate time window...", 
+                $CFG->loglifetime));
+        
+        //if user has not saved either of these via admin/server/cleanup, we need defaults
+        $starthour = isset($CFG->loglifetimestarthour)   ? $CFG->loglifetimestarthour   : 0;
+        $startmin  = isset($CFG->loglifetimestartminute) ? $CFG->loglifetimestartminute : 0;
+
+        //need stats_get_base_daily() to know when today started
+        require_once($CFG->dirroot.'/lib/statslib.php');
+
+        //calculate the bounds of the temporal window in which we can run
+        $check_window_start = stats_get_base_daily() + $starthour*60*60 + $startmin*60;
+        $check_window_end = $check_window_start + 3600;
+
+        //to prune or not to prune?
+        if ((time() > $check_window_start) && (time() < $check_window_end)) {
+            mtrace(sprintf("    Begin logs pruning"));
+
+            $loglifetime = $timenow - ($CFG->loglifetime * 3600 * 24);
+            $DB->delete_records_select("log", "time < ?", array($loglifetime));
+
+            mtrace(sprintf("    Finished logs pruning"));
+        }else{
+            mtrace(sprintf("    NOT within the window {%s - %s}, skipping"
+                    ,strftime('%l:%M %P', $check_window_start)
+                    ,strftime('%l:%M %P', $check_window_end)
+                    ));
+        }
+        
+    }
+
+    mtrace("  Finished log clean-up task");
 
     // Run cleanup core cron jobs, but not every time since they aren't too important.
     // These don't have a timer to reduce load, so we'll use a random number
     // to randomly choose the percentage of times we should run these jobs.
+
     srand ((double) microtime() * 10000000);
     $random100 = rand(0,100);
     if ($random100 < 20) {     // Approximately 20% of the time.
-        mtrace("Running clean-up tasks...");
+        mtrace("  Starting random clean-up tasks");
         cron_trace_time_and_memory();
 
         // Delete users who haven't confirmed within required period
@@ -83,7 +131,7 @@ function cron_run() {
             foreach ($rs as $user) {
                 delete_user($user); // we MUST delete user properly first
                 $DB->delete_records('user', array('id'=>$user->id)); // this is a bloody hack, but it might work
-                mtrace(" Deleted unconfirmed user for ".fullname($user, true)." ($user->id)");
+                mtrace("    Deleted unconfirmed user for ".fullname($user, true)." ($user->id)");
             }
             $rs->close();
         }
@@ -100,19 +148,10 @@ function cron_run() {
                                           array($cuttime));
             foreach ($rs as $user) {
                 delete_user($user);
-                mtrace(" Deleted not fully setup user $user->username ($user->id)");
+                mtrace("    Deleted not fully setup user $user->username ($user->id)");
             }
             $rs->close();
         }
-
-
-        // Delete old logs to save space (this might need a timer to slow it down...)
-        if (!empty($CFG->loglifetime)) {  // value in days
-            $loglifetime = $timenow - ($CFG->loglifetime * 3600 * 24);
-            $DB->delete_records_select("log", "time < ?", array($loglifetime));
-            mtrace(" Deleted old log records");
-        }
-
 
         // Delete old backup_controllers and logs.
         $loglifetime = get_config('backup', 'loglifetime');
@@ -128,7 +167,7 @@ function cron_run() {
             // Delete records from backup_controllers.
             $DB->execute("DELETE FROM {backup_controllers}
                           WHERE timecreated < ?", array($loglifetime));
-            mtrace(" Deleted old backup records");
+            mtrace("    Deleted old backup records");
         }
 
 
@@ -136,14 +175,14 @@ function cron_run() {
         if (!empty($CFG->cachetext)) {   // Defined in config.php
             $cachelifetime = time() - $CFG->cachetext - 60;  // Add an extra minute to allow for really heavy sites
             $DB->delete_records_select('cache_text', "timemodified < ?", array($cachelifetime));
-            mtrace(" Deleted old cache_text records");
+            mtrace("    Deleted old cache_text records");
         }
 
 
         if (!empty($CFG->usetags)) {
             require_once($CFG->dirroot.'/tag/lib.php');
             tag_cron();
-            mtrace(' Executed tag cron');
+            mtrace('    Executed tag cron');
         }
 
 
@@ -153,25 +192,27 @@ function cron_run() {
         context_helper::build_all_paths(false);
         // If you suspect that the context paths are somehow corrupt
         // replace the line below with: context_helper::build_all_paths(true);
-        mtrace(' Built context paths');
+        mtrace('    Built context paths');
 
 
         // Remove expired cache flags
         gc_cache_flags();
-        mtrace(' Cleaned cache flags');
+        mtrace('    Cleaned cache flags');
 
 
         // Cleanup messaging
         if (!empty($CFG->messagingdeletereadnotificationsdelay)) {
             $notificationdeletetime = time() - $CFG->messagingdeletereadnotificationsdelay;
             $DB->delete_records_select('message_read', 'notification=1 AND timeread<:notificationdeletetime', array('notificationdeletetime'=>$notificationdeletetime));
-            mtrace(' Cleaned up read notifications');
+            mtrace('    Cleaned up read notifications');
         }
 
-        mtrace("...finished clean-up tasks");
+        mtrace("  Finished random clean-up tasks");
 
-    } // End of occasional clean-up tasks
+    }
 
+    // End of occasional clean-up tasks
+    mtrace("Finished clean-up tasks");
 
     // Send login failures notification - brute force protection in moodle is weak,
     // we should at least send notices early in each cron execution
