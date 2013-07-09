@@ -87,7 +87,7 @@ if (!empty($allowedlist)) {
                     $minmark = $trackdata->score_min;
                 }
                 if (empty($trackdata->score_max)) {
-                    $maxmark = 100;
+                    $maxmark = 500;
                 } else {
                     $maxmark = $trackdata->score_max;
                 }
@@ -95,7 +95,7 @@ if (!empty($allowedlist)) {
                 if (empty($range)) {
                     continue;
                 }
-                $percent = round((($score*100)/$range), 2);
+                $percent = round((($score*500)/$range), 2);
                 if (empty($usergrades[$attempt->userid]) || !isset($usergrades[$attempt->userid]) || ($percent > $usergrades[$attempt->userid]) || ($usergrades[$attempt->userid] === '*')) {
                     $usergrades[$attempt->userid] = $percent;
                 }
