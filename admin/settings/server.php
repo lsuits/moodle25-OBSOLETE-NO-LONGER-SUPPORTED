@@ -136,7 +136,7 @@ $temp->add(new admin_setting_configselect('deleteincompleteusers', new lang_stri
 
 $temp->add(new admin_setting_configcheckbox('logguests', new lang_string('logguests', 'admin'),
                                             new lang_string('logguests_help', 'admin'), 1));
-$temp->add(new admin_setting_configselect('loglifetime', new lang_string('loglifetime', 'admin'), new lang_string('configloglifetime', 'admin'), 0, array(0 => new lang_string('neverdeletelogs'),
+$temp->add(new admin_setting_configselect('loglifetime', new lang_string('loglifetime', 'admin'), new lang_string('configloglifetime', 'admin'), 0, array(0 => get_string('neverdeletelogs', 'admin'),
                                                                                                                                                 1000 => new lang_string('numdays', '', 1000),
                                                                                                                                                 365 => new lang_string('numdays', '', 365),
                                                                                                                                                 180 => new lang_string('numdays', '', 180),
@@ -149,6 +149,7 @@ $temp->add(new admin_setting_configselect('loglifetime', new lang_string('loglif
                                                                                                                                                 5 => new lang_string('numdays', '', 5),
                                                                                                                                                 2 => new lang_string('numdays', '', 2))));
 
+$temp->add(new admin_setting_configtime('loglifetimestarthour', 'loglifetimestartminute', get_string('loglifetimestart', 'admin'), new lang_string('configloglifetimestart', 'admin'), array('h' => 0, 'm' => 0)));
 
 $temp->add(new admin_setting_configcheckbox('disablegradehistory', new lang_string('disablegradehistory', 'grades'),
                                             new lang_string('disablegradehistory_help', 'grades'), 0));
@@ -163,6 +164,8 @@ $temp->add(new admin_setting_configselect('gradehistorylifetime', new lang_strin
                                                                                                      90 => new lang_string('numdays', '', 90),
                                                                                                      60 => new lang_string('numdays', '', 60),
                                                                                                      30 => new lang_string('numdays', '', 30))));
+
+$temp->add(new admin_setting_configtime('gradehistorylifetimestarthour', 'gradehistorylifetimetartminute', get_string('gradehistorylifetimestart', 'grades'), get_string('configgradehistorylifetimestart', 'grades'), array('h' => 1, 'm' => 15)));
 
 $ADMIN->add('server', $temp);
 
