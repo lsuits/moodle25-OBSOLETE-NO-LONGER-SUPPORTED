@@ -87,12 +87,14 @@ class edit_category_form extends moodleform {
         }
 
         $mform->addElement('text', 'keephigh', get_string('keephigh', 'grades'), 0);
+        $mform->setType('keephigh', PARAM_INT);
         $mform->addHelpButton('keephigh', 'keephigh', 'grades');
         if ((int)$CFG->grade_keephigh_flag & 2) {
             $mform->setAdvanced('keephigh');
         }
 
         $mform->addElement('text', 'droplow', get_string('droplow', 'grades'), 0);
+        $mform->setType('droplow', PARAM_INT);
         $mform->addHelpButton('droplow', 'droplow', 'grades');
         $mform->disabledIf('droplow', 'keephigh', 'noteq', 0);
         if ((int)$CFG->grade_droplow_flag & 2) {
@@ -181,6 +183,7 @@ class edit_category_form extends moodleform {
             $mform->setAdvanced('curve_to');
 
             $mform->addElement('text', 'grade_item_multfactor', $curve_to);
+            $mform->setType('grade_item_multfactor', PARAM_FLOAT);
 
             $mform->disabledIf('curve_to', 'gradetype', 'eq', GRADE_TYPE_NONE);
             $mform->disabledIf('curve_to', 'gradetype', 'eq', GRADE_TYPE_TEXT);
@@ -200,6 +203,7 @@ class edit_category_form extends moodleform {
         $mform->disabledIf('grade_item_multfactor', 'gradetype', 'eq', GRADE_TYPE_TEXT);
 
         $mform->addElement('text', 'grade_item_plusfactor', get_string('plusfactor', 'grades'));
+        $mform->setType('grade_item_plusfactor', PARAM_FLOAT);
         $mform->addHelpButton('grade_item_plusfactor', 'plusfactor', 'grades');
         $mform->setAdvanced('grade_item_plusfactor');
         $mform->disabledIf('grade_item_plusfactor', 'gradetype', 'eq', GRADE_TYPE_NONE);

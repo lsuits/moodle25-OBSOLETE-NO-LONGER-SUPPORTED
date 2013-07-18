@@ -100,6 +100,7 @@ if ($id) {
 
 $multfactor = $grade_item->multfactor;
 $curve_decimals = 4;
+$decimalpoints = $grade_item->get_decimals();
 
 if ($curve_to) {
     $curve_decimals = $decimalpoints;
