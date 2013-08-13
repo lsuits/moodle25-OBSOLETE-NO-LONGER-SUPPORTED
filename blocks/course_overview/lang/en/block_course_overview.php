@@ -22,7 +22,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['activityoverview'] = 'You have {$a}s that need attention';
+$string['activityoverview'] = 'You have at least one {$a} that needs attention';
 $string['alwaysshowall'] = 'Always Show All';
 $string['collapseall'] = 'Collapse All Course Lists';
 $string['configotherexpanded'] = 'If enabled, Other Courses will be expanded by default unless overriden by user preferences.';
@@ -57,3 +57,5 @@ $string['view_edit_profile'] = '(View and edit your profile.)';
 $string['welcome'] = 'Welcome {$a}';
 $string['youhavemessages'] = 'You have {$a} unread ';
 $string['youhavenomessages'] = 'You have no unread ';
+// Added by Robert Russo to differentiate between visible courses and unavailable courses
+$string['unavailablecourses'] = '&nbsp;&nbsp;&nbsp;(Unavailable to students)';
