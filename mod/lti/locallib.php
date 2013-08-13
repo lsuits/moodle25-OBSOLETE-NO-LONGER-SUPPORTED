@@ -62,6 +62,13 @@ define('LTI_LAUNCH_CONTAINER_EMBED_NO_BLOCKS', 3);
 define('LTI_LAUNCH_CONTAINER_WINDOW', 4);
 define('LTI_LAUNCH_CONTAINER_REPLACE_MOODLE_WINDOW', 5);
 
+/*
+ * @author LSU 
+ * @see https://github.com/lsuits/moodle/issues/6
+ */
+define('LTI_LAUNCH_COURSE_ID_SHORTNAME', 0);
+define('LTI_LAUNCH_COURSE_ID_IDNUMBER',1);
+
 define('LTI_TOOL_STATE_ANY', 0);
 define('LTI_TOOL_STATE_CONFIGURED', 1);
 define('LTI_TOOL_STATE_PENDING', 2);
@@ -229,31 +236,18 @@ function lti_build_request($instance, $typeconfig, $course) {
     $role = lti_get_ims_role($USER, $instance->cmid, $instance->course);
 
 //    if (find the vlue for the setting->shortname or ignore the if/else and add it below in the 'context_label' => $course->my special value here) {
-        $requestparams = array(
+    $label = isset($typeconfig['courseidoptions']) && $typeconfig['courseidoptions'] > 0 ? $course->idnumber : $course->shortname;
+    $requestparams = array(
             'resource_link_id' => $instance->id,
             'resource_link_title' => $instance->name,
             'resource_link_description' => $instance->intro,
             'user_id' => $USER->id,
             'roles' => $role,
             'context_id' => $course->id,
-            'context_label' => $course->shortname,
+            'context_label' => $label,
             'context_title' => $course->fullname,
             'launch_presentation_locale' => current_language()
         );
-/*    } else {
-        $requestparams = array(
-            'resource_link_id' => $instance->id,
-            'resource_link_title' => $instance->name,
-            'resource_link_description' => $instance->intro,
-            'user_id' => $USER->id,
-            'roles' => $role,
-            'context_id' => $course->id,
-            'context_label' => $course->idnumber,
-            'context_title' => $course->fullname,
-            'launch_presentation_locale' => current_language()
-        );
-    }
-*/
 
     $placementsecret = $instance->servicesalt;
 
@@ -914,6 +908,10 @@ function lti_prepare_type_for_save($type, $config) {
 
     $type->timemodified = time();
 
+    if(isset($config->lti_courseidoptions)){
+        $type->courseidoptions = $config->lti_courseidoptions;
+    }
+    
     unset ($config->lti_typename);
     unset ($config->lti_toolurl);
 }
