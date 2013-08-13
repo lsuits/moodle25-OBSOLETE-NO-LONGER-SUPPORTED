@@ -104,6 +104,15 @@ class mod_lti_edit_types_form extends moodleform{
         $mform->addHelpButton('lti_launchcontainer', 'default_launch_container', 'lti');
         $mform->setType('lti_launchcontainer', PARAM_INT);
 
+        $courseidoptions=array();
+        $courseidoptions[LTI_LAUNCH_COURSE_ID_SHORTNAME] = get_string('shortname', 'moodle');
+        $courseidoptions[LTI_LAUNCH_COURSE_ID_IDNUMBER] = get_string('idnumber', 'moodle');
+
+        $mform->addElement('select', 'lti_courseidoptions', get_string('default_launch_course_id', 'lti'), $courseidoptions);
+        $mform->setDefault('lti_courseidoptions', LTI_LAUNCH_COURSE_ID_SHORTNAME);
+        $mform->addHelpButton('lti_courseidoptions', 'default_launch_course_id', 'lti');
+        $mform->setType('lti_courseidoptions', PARAM_TEXT);
+
         // Add privacy preferences fieldset where users choose whether to send their data
         $mform->addElement('header', 'privacy', get_string('privacy', 'lti'));
 
