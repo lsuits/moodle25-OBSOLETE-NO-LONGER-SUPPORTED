@@ -65,7 +65,12 @@ class block_course_overview extends block_base {
 
         profile_load_custom_fields($USER);
         list($sortedcourses, $sitecourses, $totalcourses) = block_course_overview_get_sorted_courses();
-        $overviews = block_course_overview_get_overviews($sitecourses);
+
+         if ($this->page->user_is_editing()) {
+             $overviews = '';
+         } else {
+             $overviews = block_course_overview_get_overviews($sitecourses);
+         }
 
         $renderer = $this->page->get_renderer('block_course_overview');
         if (!empty($config->showwelcomearea)) {
@@ -105,7 +110,7 @@ class block_course_overview extends block_base {
      * @return array
      */
     public function applicable_formats() {
-        return array('my-index' => true);
+        return array('site' => true, 'my-index' => true, 'course' => false);
     }
 
     /**
