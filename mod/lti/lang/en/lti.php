@@ -431,3 +431,5 @@ $string['update'] = 'Update';
 $string['using_tool_configuration'] = 'Using tool configuration: ';
 $string['validurl'] = 'A valid URL must start with http(s)://';
 $string['viewsubmissions'] = 'View submissions and grading screen';
+$string['default_launch_course_id'] = 'Course ID';
+$string['default_launch_course_id_help'] = 'Choose either shortname or idnumber based on whichever method you wish to send to your LTI provider.';
