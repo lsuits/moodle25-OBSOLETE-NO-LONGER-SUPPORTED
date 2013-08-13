@@ -799,7 +799,6 @@ function lti_get_type_config_from_instance($id) {
     if (isset($config['instructorchoiceallowroster'])) {
         $type->lti_allowroster = $config['instructorchoiceallowroster'];
     }
-
     if (isset($config['instructorcustomparameters'])) {
         $type->lti_allowsetting = $config['instructorcustomparameters'];
     }
@@ -890,6 +889,10 @@ function lti_get_type_type_config($id) {
 
     if (isset($config['module_class_type'])) {
         $type->lti_module_class_type = $config['module_class_type'];
+    }
+
+    if (isset($config['courseidoptions'])) {
+        $type->lti_courseidoptions = $config['courseidoptions'];
     }
 
     return $type;
