@@ -237,20 +237,22 @@ function lti_build_request($instance, $typeconfig, $course) {
     $role = lti_get_ims_role($USER, $instance->cmid, $instance->course);
 
 //    if (find the vlue for the setting->shortname or ignore the if/else and add it below in the 'context_label' => $course->my special value here) {
-    if(isset($typeconfig['courseidoptions']) && $typeconfig['courseidoptions'] > 0){
-        switch ($typeconfig['courseidoptions']){
-            CASE 0:
+    if(isset($typeconfig['courseidoptions'])) {
+        switch ($typeconfig['courseidoptions']) {
+            case 0:
                 $label = $course->shortname;
+                break;
             case 1:
                 $label = $course->idnumber;
                 break;
             case 2:
                 $label = $course->id;
                 break;
-                
-        }
-        
+        } 
+    } else {
+        $label = $course->shortname;
     }
+
     $requestparams = array(
             'resource_link_id' => $instance->id,
             'resource_link_title' => $instance->name,
