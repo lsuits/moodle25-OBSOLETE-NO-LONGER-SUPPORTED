@@ -239,6 +239,8 @@ function lti_build_request($instance, $typeconfig, $course) {
 //    if (find the vlue for the setting->shortname or ignore the if/else and add it below in the 'context_label' => $course->my special value here) {
     if(isset($typeconfig['courseidoptions']) && $typeconfig['courseidoptions'] > 0){
         switch ($typeconfig['courseidoptions']){
+            CASE 0:
+                $label = $course->shortname;
             case 1:
                 $label = $course->idnumber;
                 break;
