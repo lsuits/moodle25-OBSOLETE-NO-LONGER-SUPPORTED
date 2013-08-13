@@ -111,6 +111,8 @@ class mod_lti_edit_types_form extends moodleform{
         $courseidoptions=array();
         $courseidoptions[LTI_LAUNCH_COURSE_ID_SHORTNAME] = get_string('shortname', 'moodle');
         $courseidoptions[LTI_LAUNCH_COURSE_ID_IDNUMBER] = get_string('idnumber', 'moodle');
+        $courseidoptions[LTI_LAUNCH_COURSE_ID_ID] = get_string('courseid', 'lti');
+        
 
         $mform->addElement('select', 'lti_courseidoptions', get_string('default_launch_course_id', 'lti'), $courseidoptions);
         $mform->setDefault('lti_courseidoptions', LTI_LAUNCH_COURSE_ID_SHORTNAME);
