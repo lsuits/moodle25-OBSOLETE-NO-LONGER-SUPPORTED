@@ -29,13 +29,20 @@
  * @return array html overview
  */
 function block_course_overview_get_overviews($courses) {
-    $htmlarray = array();
-    if ($modules = get_plugin_list_with_function('mod', 'print_overview')) {
-        foreach ($modules as $fname) {
-            $fname($courses,$htmlarray);
+    if (!has_capability('moodle/course:create', get_context_instance(CONTEXT_SYSTEM))) {
+        foreach ($courses as $key=>$course) {
+            if ($course->visible == 1) {
+                $visiblecourses[$key] = $course;
+            }
         }
+        $htmlarray = array();
+        if ((isset($visiblecourses)) && ($modules = get_plugin_list_with_function('mod', 'print_overview'))) {
+            foreach ($modules as $fname) {
+                $fname($visiblecourses,$htmlarray);
+            }
+        }
+        return $htmlarray;
     }
-    return $htmlarray;
 }
 
 /**
