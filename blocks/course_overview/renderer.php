@@ -101,20 +101,25 @@ class block_course_overview_renderer extends plugin_renderer_base {
 
             }
 
-            // No need to pass title through s() here as it will be done automatically by html_writer.
-            $attributes = array('title' => $course->fullname);
+            // Modified by Robert Russo to differentiate between visible courses and unavailable courses
             if (empty($course->visible)) {
-                $attributes['class'] = 'dimmed';
+                $attributes = array('title' => s($course->fullname), 'class' => 'dimmed');
+                // Added by Robert Russo to differentiate between visible courses and unavailable courses
+                $availability = html_writer::start_tag('span');
+                $availability .= get_string('unavailablecourses', 'block_course_overview');
+                $availability .= html_writer::end_tag('span');
+            } else {
+                $attributes = array('title' => s($course->fullname));
+                $availability = '';
             }
+            // Modified by Robert Russo to differentiate between visible courses and unavailable courses
             if ($course->id > 0) {
-                $courseurl = new moodle_url('/course/view.php', array('id' => $course->id));
-                $coursefullname = format_string($course->fullname, true, $course->id);
-                $link = html_writer::link($courseurl, $coursefullname, $attributes);
-                $html .= $this->output->heading($link, 2, 'title');
+                $link = html_writer::link(new moodle_url('/course/view.php', array('id' => $course->id)), format_string($course->fullname, true, $course->id), $attributes) . $availability;
+                $html .= $this->output->heading($link, 3, 'main');
             } else {
                 $html .= $this->output->heading(html_writer::link(
                     new moodle_url('/auth/mnet/jump.php', array('hostid' => $course->hostid, 'wantsurl' => '/course/view.php?id='.$course->remoteid)),
-                    format_string($course->shortname, true), $attributes) . ' (' . format_string($course->hostname) . ')', 2, 'title');
+                    format_string($course->shortname, true, $course->id), $attributes) . $availability . ' (' . format_string($course->hostname) . ')', 3, 'main');
             }
             $html .= $this->output->box('', 'flush');
             $html .= html_writer::end_tag('div');
