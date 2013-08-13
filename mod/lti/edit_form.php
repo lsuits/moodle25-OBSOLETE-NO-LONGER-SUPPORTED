@@ -104,6 +104,10 @@ class mod_lti_edit_types_form extends moodleform{
         $mform->addHelpButton('lti_launchcontainer', 'default_launch_container', 'lti');
         $mform->setType('lti_launchcontainer', PARAM_INT);
 
+        /**
+         * @author LSU
+         * @see https://github.com/lsuits/moodle/issues/6
+         */
         $courseidoptions=array();
         $courseidoptions[LTI_LAUNCH_COURSE_ID_SHORTNAME] = get_string('shortname', 'moodle');
         $courseidoptions[LTI_LAUNCH_COURSE_ID_IDNUMBER] = get_string('idnumber', 'moodle');
