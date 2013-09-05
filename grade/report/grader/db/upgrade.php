@@ -1,52 +1,55 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * Upgrade code for gradebook grader report.
+ *
+ * @package   gradereport_grader
+ * @copyright 2013 Moodle Pty Ltd (http://moodle.com)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
 function xmldb_gradereport_grader_upgrade($oldversion) {
+    global $CFG, $DB;
 
-    $upgrade = new gradereport_grader_upgrade(array(
-        new grader_manual_items(),
-        new grader_anonymous_grading()
-    ));
+    $dbman = $DB->get_manager();
 
-    return $upgrade->from($oldversion);
-}
-
-abstract class gradereport_grader_upgrade_state {
-    var $version;
-
-    abstract function upgrade($db);
-
-    function __invoke($db) {
-        return $this->upgrade($db);
-    }
-}
-
-class grader_anonymous_grading extends gradereport_grader_upgrade_state {
-    var $version = 2013052800;
-
-    function upgrade($db) {
-        $dbman = $db->get_manager();
-
-        // Define table grade_anonymous_items to be created
+    // Create tables to support anonymous grading.
+    if ($oldversion < 2013052800) {
+        // Define table grade_anonymous_items to be created.
         $table = new xmldb_table('grade_anon_items');
 
-        // Adding fields to table grade_anonymous_items
+        // Adding fields to table grade_anonymous_items.
         $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
         $table->add_field('itemid', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null);
         $table->add_field('complete', XMLDB_TYPE_INTEGER, '1', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '0');
 
-        // Adding keys to table grade_anonymous_items
+        // Adding keys to table grade_anonymous_items.
         $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
         $table->add_key('fk_gradeitemid', XMLDB_KEY_FOREIGN_UNIQUE, array('itemid'), 'grade_items', array('id'));
 
-        // Conditionally launch create table for grade_anonymous_items
+        // Conditionally launch create table for grade_anonymous_items.
         if (!$dbman->table_exists($table)) {
             $dbman->create_table($table);
         }
 
-        // Define table grade_anon_items_history to be created
+        // Define table grade_anon_items_history to be created.
         $table = new xmldb_table('grade_anon_items_history');
 
-        // Adding fields to table grade_anon_items_history
+        // Adding fields to table grade_anon_items_history.
         $table->add_field('id', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
         $table->add_field('action', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null);
         $table->add_field('oldid', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null);
@@ -56,44 +59,44 @@ class grader_anonymous_grading extends gradereport_grader_upgrade_state {
         $table->add_field('itemid', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null);
         $table->add_field('complete', XMLDB_TYPE_INTEGER, '1', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '0');
 
-        // Adding keys to table grade_anon_items_history
+        // Adding keys to table grade_anon_items_history.
         $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
 
-        // Adding indexes to table grade_anon_items_history
+        // Adding indexes to table grade_anon_items_history.
         $table->add_index('gradeanonhist_act_ix', XMLDB_INDEX_NOTUNIQUE, array('action'));
         $table->add_index('gradeanonhist_old_ix', XMLDB_INDEX_NOTUNIQUE, array('oldid'));
         $table->add_index('gradeanonhist_log_ix', XMLDB_INDEX_NOTUNIQUE, array('loggeduser'));
         $table->add_index('gradeanonhist_ite_ix', XMLDB_INDEX_NOTUNIQUE, array('itemid'));
 
-        // Conditionally launch create table for grade_anon_items_history
+        // Conditionally launch create table for grade_anon_items_history.
         if (!$dbman->table_exists($table)) {
             $dbman->create_table($table);
         }
 
-         // Define table grade_anonymous_grades to be created
+         // Define table grade_anonymous_grades to be created.
         $table = new xmldb_table('grade_anon_grades');
 
-        // Adding fields to table grade_anonymous_grades
+        // Adding fields to table grade_anonymous_grades.
         $table->add_field('id', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
         $table->add_field('anonymous_itemid', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null);
         $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null);
         $table->add_field('finalgrade', XMLDB_TYPE_NUMBER, '10, 5', null, null, null, null);
         $table->add_field('adjust_value', XMLDB_TYPE_NUMBER, '10, 5', null, null, null, '0.00000');
 
-        // Adding keys to table grade_anonymous_grades
+        // Adding keys to table grade_anonymous_grades.
         $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
         $table->add_key('fk_gradeitemid', XMLDB_KEY_FOREIGN, array('anonymous_itemid'), 'grade_anonymous_items', array('id'));
         $table->add_key('fk_userid', XMLDB_KEY_FOREIGN, array('userid'), 'user', array('id'));
 
-        // Conditionally launch create table for grade_anonymous_grades
+        // Conditionally launch create table for grade_anonymous_grades.
         if (!$dbman->table_exists($table)) {
             $dbman->create_table($table);
         }
 
-         // Define table grade_anon_grades_history to be created
+         // Define table grade_anon_grades_history to be created.
         $table = new xmldb_table('grade_anon_grades_history');
 
-        // Adding fields to table grade_anon_grades_history
+        // Adding fields to table grade_anon_grades_history.
         $table->add_field('id', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
         $table->add_field('action', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null);
         $table->add_field('oldid', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null);
@@ -105,78 +108,33 @@ class grader_anonymous_grading extends gradereport_grader_upgrade_state {
         $table->add_field('finalgrade', XMLDB_TYPE_NUMBER, '10, 5', null, null, null, null);
         $table->add_field('adjust_value', XMLDB_TYPE_NUMBER, '10, 5', null, XMLDB_NOTNULL, null, '0.00000');
 
-        // Adding keys to table grade_anon_grades_history
+        // Adding keys to table grade_anon_grades_history.
         $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
 
-        // Adding indexes to table grade_anon_grades_history
+        // Adding indexes to table grade_anon_grades_history.
         $table->add_index('gradeanongrahist_act_ix', XMLDB_INDEX_NOTUNIQUE, array('action'));
         $table->add_index('gradeanongrahist_old_ix', XMLDB_INDEX_NOTUNIQUE, array('oldid'));
         $table->add_index('gradeanongrahist_log_ix', XMLDB_INDEX_NOTUNIQUE, array('loggeduser'));
         $table->add_index('gradeanongrahist_ait_ix', XMLDB_INDEX_NOTUNIQUE, array('anonymous_itemid'));
 
-        // Conditionally launch create table for grade_anon_grades_history
+        // Conditionally launch create table for grade_anon_grades_history.
         if (!$dbman->table_exists($table)) {
             $dbman->create_table($table);
         }
 
-        return true;
-    }
-}
-
-class grader_manual_items extends gradereport_grader_upgrade_state {
-    var $version = 2013052800;
-
-    function upgrade($db) {
-        $base_sql = "%s {grade_grades} gr, {grade_items} gi %s " .
-            "WHERE gi.id = gr.itemid AND gi.itemtype = 'manual'";
-
-        $sql = sprintf($base_sql, "SELECT COUNT(*) FROM", "");
-
-        $count = $db->count_records_sql($sql);
-
-        if (empty($count)) {
-            return true;
-        } else {
-            $sql = sprintf($base_sql, "UPDATE", "SET gr.rawgrade = gr.finalgrade");
-
-            return $db->execute($sql);
-        }
-    }
-}
-
-class gradereport_grader_upgrade {
-    function __construct($upgrades) {
-        $this->upgrades = $upgrades;
+        upgrade_plugin_savepoint(true, 2013052800, 'gradereport', 'grader');
     }
 
-    function from($oldversion) {
-        global $DB;
+    // Set rawgrade on manual grade items so that multiplicator and offset
+    // works on them like any other grade item.
+    if ($oldversion < 2013052801) {
+        $sql = "UPDATE  {grade_grades} gr, {grade_items} gi
+                SET     gr.rawgrade = gr.finalgrade
+                WHERE   gi.id = gr.itemid AND gi.itemtype = 'manual'";
+        $DB->execute($sql);
 
-        // Oldest upgrade first
-        usort($this->upgrades, function($a, $b) {
-            $diff = ($a->version < $b->version) ? -1 : 1;
-            return ($a->version == $b->version) ? 0 : $diff;
-        });
-
-        $result = true;
-
-        foreach ($this->upgrades as $upgrade) {
-            if (!$result) continue;
-
-            if ($oldversion < $upgrade->version and is_callable($upgrade)) {
-
-                try {
-                    $success = $upgrade($DB);
-
-                    $result = ($result and $success);
-                } catch (Exception $e) {
-                    $result = false;
-                }
-
-                upgrade_plugin_savepoint($result, $upgrade->version, 'gradereport', 'grader');
-            }
-        }
-
-        return $result;
+        upgrade_plugin_savepoint(true, 2013052801, 'gradereport', 'grader');
     }
+
+    return true;
 }
