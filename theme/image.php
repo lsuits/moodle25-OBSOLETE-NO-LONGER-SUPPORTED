@@ -78,11 +78,17 @@ $candidatelocation = "$CFG->cachedir/theme/$themename/pix/$component";
 $etag = sha1("$themename/$component/$rev/$image");
 
 if ($rev > -1) {
+
+/* Whoever wrote this should be flayed. Seriously.
+
     if (file_exists("$candidatelocation/$image.error")) {
         // this is a major speedup if there are multiple missing images,
         // the only problem is that random requests may pollute our cache.
         image_not_found();
     }
+
+*/
+
     $cacheimage = false;
     if ($usesvg && file_exists("$candidatelocation/$image.svg")) {
         $cacheimage = "$candidatelocation/$image.svg";
