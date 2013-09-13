@@ -70,6 +70,64 @@ function update_category_aggregation(e, args) {
 }
 
 
+
+YUI().use("node-base", function(Y)
+{
+    function add_grademax_change_listeners(){
+        Y.all('.grademax').on('change', function(ev)
+            {
+                var node    = ev.target;
+                var id      = node.get('name');
+                var regex   = new RegExp('grademax_([0-9]+)');
+                var matcher = regex.exec(id);
+                var gradeId = matcher[1] || false;
+                var curveTo = gradeId ? Y.one("#multfactor"+gradeId) : null;
+
+                if(curveTo != null){
+                    var storedMult  = curveTo.getData("multfactor"+gradeId);
+                    var newGrMax    = parseFloat(node.get("value"));
+
+                    if(typeof storedMult !== "undefined"){
+                        curveTo.setAttribute("value", storedMult*newGrMax);
+                    }
+                }
+            }
+        );
+    }
+    
+    function compute_multfactors(){
+        Y.all('.grademax').each(function(node, index)
+            {
+                var id      = node.get('name');
+                var regex   = new RegExp('grademax_([0-9]+)');
+                var matcher = regex.exec(id);
+                var gradeId = matcher[1] || false;
+                var curveTo = gradeId ? Y.one("#multfactor"+gradeId) : null;
+
+                if(curveTo != null){
+                    var crveVal = parseFloat(curveTo.get("value"));
+                    var grMax   = parseFloat(node.get("value"));
+                    var mFactor = crveVal/grMax;
+
+                    curveTo.setData("multfactor"+gradeId, mFactor);
+                }
+
+            }
+        );
+    };
+    
+    function setup_curveto(){
+        compute_multfactors();
+        add_grademax_change_listeners();
+    };
+    
+    Y.on(
+        "domready",
+        setup_curveto()
+    );
+});
+
+
 /* TODO: finish and rewrite for YUI3...
 Y.YUI2.namespace('grade_edit_tree');
 

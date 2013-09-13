@@ -804,7 +804,7 @@ class grade_edit_tree_column_range extends grade_edit_tree_column {
 
     public function get_item_cell($item, $params) {
         global $DB, $OUTPUT;
-
+        $this->curve_to = get_config('moodle', 'grade_multfactor_alt');
         // If the parent aggregation is Sum of Grades, this cannot be changed
         $parent_cat = $item->get_parent_category();
         if ($parent_cat->aggregation == GRADE_AGGREGATE_SUM) {
@@ -821,9 +821,15 @@ class grade_edit_tree_column_range extends grade_edit_tree_column {
         } elseif ($item->is_external_item()) {
             $grademax = format_float($item->grademax, $item->get_decimals());
         } else {
-            $grademax = '<label class="accesshide" for="grademax'.$item->id.'">'.get_string('grademax', 'grades').'</label>
-                <input type="text" size="6" id="grademax'.$item->id.'" name="grademax_'.$item->id.'" value="'.
-                format_float($item->grademax, $item->get_decimals()).'" />';
+            if ($this->curve_to) {
+                $grademax = '<label class="accesshide" for="grademax'.$item->id.'">'.get_string('grademax', 'grades').'</label>
+                    <input type="text" size="6" id="grademax'.$item->id.'" class="grademax" name="grademax_'.$item->id.'" value="'.
+                    format_float($item->grademax, $item->get_decimals()).'" />';
+            } else {
+                $grademax = '<label class="accesshide" for="grademax'.$item->id.'">'.get_string('grademax', 'grades').'</label>
+                    <input type="text" size="6" id="grademax'.$item->id.'" name="grademax_'.$item->id.'" value="'.
+                    format_float($item->grademax, $item->get_decimals()).'" />';
+            }
         }
 
         $itemcell = clone($this->itemcell);
