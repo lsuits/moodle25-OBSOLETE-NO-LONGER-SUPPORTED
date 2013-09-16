@@ -496,6 +496,11 @@ class edit_category_form extends moodleform {
                 }
             }
         }
+        // Freeze grademin element if option unavailable
+        $min_is_hidden = (bool) get_config('moodle', 'grade_min_hide');
+        if ($min_is_hidden and $mform->elementExists('grade_item_grademin')) {
+            $mform->hardFreeze('grade_item_grademin');
+        }
     }
 
 /// perform extra validation before submission
