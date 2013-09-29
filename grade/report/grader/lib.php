@@ -1534,6 +1534,7 @@ class grade_report_grader extends grade_report {
                 }
             }
 
+            $no_grade_SQL = $meanselection == 2 ? ' AND g.finalgrade > 0 ': '';
             // MDL-10875 Empty grades must be evaluated as grademin, NOT always 0
             // This query returns a count of ungraded grades (NULL finalgrade OR no matching record in grade_grades table)
             $sql = "SELECT gi.id, COUNT(DISTINCT u.id) AS count
@@ -1544,7 +1545,7 @@ class grade_report_grader extends grade_report {
                       JOIN {role_assignments} ra
                            ON ra.userid = u.id
                       LEFT OUTER JOIN {grade_grades} g
-                           ON (g.itemid = gi.id AND g.userid = u.id AND g.finalgrade IS NOT NULL)
+                           ON (g.itemid = gi.id AND g.userid = u.id AND (g.finalgrade IS NOT NULL $no_grade_SQL))
                       $groupsql
                      WHERE gi.courseid = :courseid
                            AND ra.roleid $gradebookrolessql
@@ -1579,8 +1580,7 @@ class grade_report_grader extends grade_report {
                 } else {
                     $ungradedcount = $ungradedcounts[$itemid]->count;
                 }
-
-                if ($meanselection == GRADE_REPORT_MEAN_GRADED) {
+                if (($meanselection == GRADE_REPORT_MEAN_GRADED) || ($meanselection == GRADE_REPORT_MEAN_GRADED_NO_ZEROS)) {
                     $meancount = $totalcount - $ungradedcount;
                 } else { // Bump up the sum by the number of ungraded items * grademin
                     $sumarray[$item->id] += $ungradedcount * $item->grademin;

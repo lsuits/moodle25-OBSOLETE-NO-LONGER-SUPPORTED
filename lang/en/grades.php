@@ -400,6 +400,7 @@ $string['max'] = 'Highest';
 $string['maxgrade'] = 'Max grade';
 $string['meanall'] = 'All grades';
 $string['meangraded'] = 'Non-empty grades';
+$string['meangradednozeros'] = 'Non-empty, non-zero grades';
 $string['meanselection'] = 'Grades selected for column averages';
 $string['meanselection_help'] = 'This setting determines whether cells with no grade should be included when calculating the average (mean) for each category or grade item.';
 $string['median'] = 'Median';

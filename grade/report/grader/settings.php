@@ -59,7 +59,8 @@ if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_configselect('grade_report_meanselection', get_string('meanselection', 'grades'),
                                               get_string('meanselection_help', 'grades'), GRADE_REPORT_MEAN_GRADED,
                                               array(GRADE_REPORT_MEAN_ALL => get_string('meanall', 'grades'),
-                                                    GRADE_REPORT_MEAN_GRADED => get_string('meangraded', 'grades'))));
+                                                    GRADE_REPORT_MEAN_GRADED => get_string('meangraded', 'grades'),
+                                                    GRADE_REPORT_MEAN_GRADED_NO_ZEROS => get_string('meangradednozeros', 'grades'))));
 
     $settings->add(new admin_setting_configcheckbox('grade_report_enableajax', get_string('enableajax', 'grades'),
                                                 get_string('enableajax_help', 'grades'), 0));
