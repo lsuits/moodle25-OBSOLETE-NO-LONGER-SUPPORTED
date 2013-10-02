@@ -109,8 +109,8 @@ class mod_lti_edit_types_form extends moodleform{
          * @see https://github.com/lsuits/moodle/issues/6
          */
         $courseidoptions=array();
-        $courseidoptions[LTI_LAUNCH_COURSE_ID_SHORTNAME] = get_string('shortname', 'moodle');
-        $courseidoptions[LTI_LAUNCH_COURSE_ID_IDNUMBER] = get_string('idnumber', 'moodle');
+        $courseidoptions[LTI_LAUNCH_COURSE_ID_SHORTNAME] = get_string('shortnamecourse', 'moodle');
+        $courseidoptions[LTI_LAUNCH_COURSE_ID_IDNUMBER] = get_string('idnumbercourse', 'moodle');
         $courseidoptions[LTI_LAUNCH_COURSE_ID_ID] = get_string('courseid', 'lti');
         
 
