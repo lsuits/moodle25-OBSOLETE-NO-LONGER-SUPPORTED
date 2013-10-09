@@ -80,6 +80,9 @@ class mod_lti_generator extends testing_module_generator {
         if (!isset($record->grade)) {
             $record->grade = 100;
         }
+        if (!isset($record->instructorchoicesendusername)) {
+            $record->instructorchoicesendusername = 1;
+        }
         if (!isset($record->instructorchoicesendname)) {
             $record->instructorchoicesendname = 1;
         }
