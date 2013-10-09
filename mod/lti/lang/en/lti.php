@@ -370,6 +370,17 @@ The tool provider may need launcher\'s e-mail addresses to distinguish users wit
 to users based on actions within the tool.
 
 Note that this setting may be overriden in the tool configuration.';
+
+$string['share_username'] = 'Share launcher\'s username with the tool';
+$string['share_username_admin'] = 'Share launcher\'s username with tool';
+$string['share_username_admin_help'] = 'Specify whether the user name of the user launching the tool should be shared with the tool provider.
+The tool provider may need launchers\' usernames to show meaningful information within the tool.';
+$string['share_username_help'] = 'Specify whether the user name of the user launching the tool should be shared with the tool provider.
+The tool provider may need launchers\' usernames to show meaningful information within the tool.
+
+Note that this setting may be overriden in the tool configuration.';
+
+
 $string['share_name'] = 'Share launcher\'s name with the tool';
 $string['share_name_admin'] = 'Share launcher\'s name with tool';
 $string['share_name_admin_help'] = 'Specify whether the full name of the user launching the tool should be shared with the tool provider.

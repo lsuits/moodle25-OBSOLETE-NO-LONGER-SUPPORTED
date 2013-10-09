@@ -153,6 +153,10 @@ class mod_lti_mod_form extends moodleform_mod {
         // Add privacy preferences fieldset where users choose whether to send their data
         $mform->addElement('header', 'privacy', get_string('privacy', 'lti'));
 
+        $mform->addElement('advcheckbox', 'instructorchoicesendusername', '&nbsp;', ' ' . get_string('share_username', 'lti'));
+        $mform->setDefault('instructorchoicesendusername', '1');
+        $mform->addHelpButton('instructorchoicesendusername', 'share_username', 'lti');
+
         $mform->addElement('advcheckbox', 'instructorchoicesendname', '&nbsp;', ' ' . get_string('share_name', 'lti'));
         $mform->setDefault('instructorchoicesendname', '1');
         $mform->addHelpButton('instructorchoicesendname', 'share_name', 'lti');

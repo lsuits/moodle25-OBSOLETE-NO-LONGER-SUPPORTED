@@ -104,6 +104,7 @@ function lti_view($instance) {
         //There is no admin configuration for this tool. Use configuration in the lti instance record plus some defaults.
         $typeconfig = (array)$instance;
 
+        $typeconfig['sendusername'] = $instance->instructorchoicesendusername;
         $typeconfig['sendname'] = $instance->instructorchoicesendname;
         $typeconfig['sendemailaddr'] = $instance->instructorchoicesendemailaddr;
         $typeconfig['customparameters'] = $instance->instructorcustomparameters;
@@ -298,6 +299,11 @@ function lti_build_request($instance, $typeconfig, $course) {
     if ( $typeconfig['sendemailaddr'] == LTI_SETTING_ALWAYS ||
          ( $typeconfig['sendemailaddr'] == LTI_SETTING_DELEGATE && $instance->instructorchoicesendemailaddr == LTI_SETTING_ALWAYS ) ) {
         $requestparams['lis_person_contact_email_primary'] = $USER->email;
+    }
+
+    if ( $typeconfig['sendusername'] == LTI_SETTING_ALWAYS ||
+         ( $typeconfig['sendusername'] == LTI_SETTING_DELEGATE && $instance->instructorchoicesendusername == LTI_SETTING_ALWAYS ) ) {
+        $requestparams['lis_person_sourcedid'] = $USER->username;
     }
 
     // Concatenate the custom parameters from the administrator and the instructor
@@ -803,6 +809,9 @@ function lti_get_type_config_from_instance($id) {
     if (isset($config['toolurl'])) {
         $type->lti_toolurl = $config['toolurl'];
     }
+    if (isset($config['instructorchoicesendusername'])) {
+        $type->lti_sendusername = $config['instructorchoicesendusername'];
+    }
     if (isset($config['instructorchoicesendname'])) {
         $type->lti_sendname = $config['instructorchoicesendname'];
     }
@@ -849,8 +858,14 @@ function lti_get_type_type_config($id) {
         $type->lti_password = $config['password'];
     }
 
+    if (isset($config['sendusername'])) {
+        $type->lti_sendusername = $config['sendusername'];
+    }
     if (isset($config['sendname'])) {
         $type->lti_sendname = $config['sendname'];
+    }
+    if (isset($config['instructorchoicesendusername'])) {
+        $type->lti_instructorchoicesendusername = $config['instructorchoicesendusername'];
     }
     if (isset($config['instructorchoicesendname'])) {
         $type->lti_instructorchoicesendname = $config['instructorchoicesendname'];

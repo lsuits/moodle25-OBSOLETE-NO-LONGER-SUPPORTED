@@ -73,6 +73,7 @@ class backup_lti_activity_structure_step extends backup_activity_structure_step 
             'securetoolurl',
             'preferheight',
             'launchcontainer',
+            'instructorchoicesendusername',
             'instructorchoicesendname',
             'instructorchoicesendemailaddr',
             'instructorchoiceacceptgrades',
