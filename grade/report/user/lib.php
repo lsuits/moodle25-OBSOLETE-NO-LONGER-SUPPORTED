@@ -400,11 +400,12 @@ class grade_report_user extends grade_report {
                     $classfeedback = $class;
                 }
                 $class .= " itemcenter ";
+                $parent = $grade_object->get_parent_category();
                 if ($this->showweight) {
                     $data['weight']['class'] = $class;
                     $data['weight']['content'] = '-';
                     // has a weight assigned, might be extra credit
-                    if ($grade_object->aggregationcoef > 0 && $type <> 'courseitem') {
+                    if ($grade_object->aggregationcoef > 0 && $type <> 'courseitem' && $parent->aggregation != GRADE_AGGREGATE_WEIGHTED_MEAN2) {
                         $data['weight']['content'] = number_format($grade_object->aggregationcoef,2);
                     }
                 }
