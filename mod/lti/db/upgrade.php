@@ -79,6 +79,21 @@ function xmldb_lti_upgrade($oldversion) {
     // Moodle v2.5.0 release upgrade line.
     // Put any upgrade step following this.
 
+    if ($oldversion < 2013100900) {
+
+        // Define field instructorchoicesendusername to be added to lti.
+        $table = new xmldb_table('lti');
+        $field = new xmldb_field('instructorchoicesendusername', XMLDB_TYPE_INTEGER, '1', null, null, null, '0', 'securetoolurl');
+
+        // Conditionally launch add field instructorchoicesendusername.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Lti savepoint reached.
+        upgrade_mod_savepoint(true, 2013100900, 'lti');
+    }
+
 
     return true;
 }

@@ -127,6 +127,11 @@ class mod_lti_edit_types_form extends moodleform{
         $options[1] = get_string('always', 'lti');
         $options[2] = get_string('delegate', 'lti');
 
+        $mform->addElement('select', 'lti_sendusername', get_string('share_username_admin', 'lti'), $options);
+        $mform->setType('lti_sendusername', PARAM_INT);
+        $mform->setDefault('lti_sendusername', '2');
+        $mform->addHelpButton('lti_sendusername', 'share_username_admin', 'lti');
+
         $mform->addElement('select', 'lti_sendname', get_string('share_name_admin', 'lti'), $options);
         $mform->setType('lti_sendname', PARAM_INT);
         $mform->setDefault('lti_sendname', '2');
