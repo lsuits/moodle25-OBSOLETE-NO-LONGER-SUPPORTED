@@ -104,6 +104,21 @@ class mod_lti_edit_types_form extends moodleform{
         $mform->addHelpButton('lti_launchcontainer', 'default_launch_container', 'lti');
         $mform->setType('lti_launchcontainer', PARAM_INT);
 
+        /**
+         * @author LSU
+         * @see https://github.com/lsuits/moodle/issues/6
+         */
+        $courseidoptions=array();
+        $courseidoptions[LTI_LAUNCH_COURSE_ID_SHORTNAME] = get_string('shortnamecourse', 'moodle');
+        $courseidoptions[LTI_LAUNCH_COURSE_ID_IDNUMBER] = get_string('idnumbercourse', 'moodle');
+        $courseidoptions[LTI_LAUNCH_COURSE_ID_ID] = get_string('courseid', 'lti');
+        
+
+        $mform->addElement('select', 'lti_courseidoptions', get_string('default_launch_course_id', 'lti'), $courseidoptions);
+        $mform->setDefault('lti_courseidoptions', LTI_LAUNCH_COURSE_ID_SHORTNAME);
+        $mform->addHelpButton('lti_courseidoptions', 'default_launch_course_id', 'lti');
+        $mform->setType('lti_courseidoptions', PARAM_TEXT);
+
         // Add privacy preferences fieldset where users choose whether to send their data
         $mform->addElement('header', 'privacy', get_string('privacy', 'lti'));
 
@@ -111,6 +126,11 @@ class mod_lti_edit_types_form extends moodleform{
         $options[0] = get_string('never', 'lti');
         $options[1] = get_string('always', 'lti');
         $options[2] = get_string('delegate', 'lti');
+
+        $mform->addElement('select', 'lti_sendusername', get_string('share_username_admin', 'lti'), $options);
+        $mform->setType('lti_sendusername', PARAM_INT);
+        $mform->setDefault('lti_sendusername', '2');
+        $mform->addHelpButton('lti_sendusername', 'share_username_admin', 'lti');
 
         $mform->addElement('select', 'lti_sendname', get_string('share_name_admin', 'lti'), $options);
         $mform->setType('lti_sendname', PARAM_INT);

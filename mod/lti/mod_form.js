@@ -182,6 +182,7 @@
         updatePrivacySettings: function(toolInfo){
             if(!toolInfo || !toolInfo.toolid){
                 toolInfo = {
+                    sendusername: M.mod_lti.LTI_SETTING_DELEGATE,
                     sendname: M.mod_lti.LTI_SETTING_DELEGATE,
                     sendemailaddr: M.mod_lti.LTI_SETTING_DELEGATE,
                     acceptgrades: M.mod_lti.LTI_SETTING_DELEGATE
@@ -191,6 +192,7 @@
             var setting, control;
 
             var privacyControls = {
+                sendusername: Y.one('#id_instructorchoicesendusername'),
                 sendname: Y.one('#id_instructorchoicesendname'),
                 sendemailaddr: Y.one('#id_instructorchoicesendemailaddr'),
                 acceptgrades: Y.one('#id_instructorchoiceacceptgrades')
