@@ -61,6 +61,12 @@ function session_get_instance() {
                 $session_class = SESSION_CUSTOM_CLASS;
                 $session = new $session_class();
 
+            } else if (!empty($CFG->session_save_path_memcache)) {
+                $session = new memcache_session();
+
+            } else if (!empty($CFG->session_save_path_redis)) {
+                $session = new redis_session();
+
             } else if ((!isset($CFG->dbsessions) or $CFG->dbsessions) and $DB->session_lock_supported()) {
                 // default recommended session type
                 $session = new database_session();
@@ -402,6 +408,86 @@ abstract class session_stub implements moodle_session {
     protected abstract function init_session_storage();
 }
 
+/**
+ * Memcache session handler
+ */
+class memcache_session extends session_stub {
+    protected function init_session_storage() {
+        global $CFG;
+
+        if (empty($CFG->session_save_path_memcache)) {
+            throw new coding_exception('The $CFG->session_save_path_memcache is empty and must be configured for Memcache sessions');
+        }
+        ini_set('session.save_handler', 'memcache');
+        ini_set('session.save_path', $CFG->session_save_path_memcache);
+        ini_set('session.gc_maxlifetime', $CFG->sessiontimeout);
+    }
+
+    public function session_exists($sid) {
+        global $CFG;
+
+        $memcache = new Memcache();
+        if ($memcache->connect($CFG->session_save_path_memcache)) {
+            $value = $memcache->get($sid);
+            $memcache->close();
+
+            if ($value !== false) {
+                return true;
+            }
+        }
+        return false;
+    }
+}
+
+/**
+ * Redis session handler
+ */
+class redis_session extends session_stub {
+    /**
+     * Default session key prefix
+     */
+    const SESSION_KEY_PREFIX = 'PHPREDIS_SESSION:';
+
+    /**
+     * Get the session key prefix value
+     *
+     * @return string
+     */
+    protected function get_session_key_prefix_redis() {
+        global $CFG;
+
+        if (!empty($CFG->session_key_prefix_redis)) {
+            return $CFG->session_key_prefix_redis;
+        }
+        return self::SESSION_KEY_PREFIX;
+    }
+
+    protected function init_session_storage() {
+        global $CFG;
+
+        if (empty($CFG->session_save_path_redis)) {
+            throw new coding_exception('The $CFG->session_save_path_redis is empty and must be configured for Redis sessions');
+        }
+        ini_set('session.save_handler', 'redis');
+        ini_set('session.save_path', $CFG->session_save_path_redis);
+        ini_set('session.gc_maxlifetime', $CFG->sessiontimeout);
+    }
+
+    public function session_exists($sid) {
+        global $CFG;
+
+        $redis = new Redis();
+        if ($redis->connect($CFG->session_save_path_redis)) {
+            $value = $redis->exists($this->get_session_key_prefix_redis().$sid);
+            $redis->close();
+
+            if ($value) {
+                return true;
+            }
+        }
+        return false;
+    }
+}
 
 /**
  * Legacy moodle sessions stored in files, not recommended any more.
