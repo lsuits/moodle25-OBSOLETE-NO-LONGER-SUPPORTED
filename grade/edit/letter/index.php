@@ -44,8 +44,10 @@ if (!$edit) {
     require_capability('moodle/grade:manageletters', $context);
 }
 
+// <LSUGRADES> If custom percents are used, adhere to the decimal places set by the teacher for the item or course when converting to letter. If not, use the moodle default of 2 decimal places.
 $custom = (bool) get_config('moodle', 'grade_letters_custom');
 $decimals = $custom ? (int) get_config('moodle', 'grade_decimalpoints') : 2;
+// </LSUGRADES>
 
 $returnurl = null;
 $editparam = null;
@@ -68,11 +70,13 @@ if ($context->contextlevel == CONTEXT_SYSTEM or $context->contextlevel == CONTEX
     $returnurl = $CFG->wwwroot.'/grade/edit/letter/index.php?id='.$context->id;
     $editparam = '&edit=1';
 
+    // <LSUGRADES> Again, if the letter grade uses a custom percentage, then adhere to the decimal places the teacher has set for the item in question.
     if ($custom) {
         $item = grade_item::fetch(array('itemtype' => 'course', 'courseid' => $course->id));
 
         $decimals = $item ? $item->get_decimals() : $decimals;
     }
+    // </LSUGRADES>
 
     $gpr = new grade_plugin_return(array('type'=>'edit', 'plugin'=>'letter', 'courseid'=>$course->id));
 } else {
@@ -92,11 +96,19 @@ if (!$edit) {
     $max = 100;
     foreach($letters as $boundary=>$letter) {
         $line = array();
+
+        // <LSUGRADES> DO NOT assume 2 decimal places, instead use the values set by the teacher for the item in question.
         $line[] = format_float($max, $decimals).' %';
         $line[] = format_float($boundary, $decimals).' %';
+        // </LSUGRADES>
+
         $line[] = format_string($letter);
         $data[] = $line;
+
+        // <LSUGRADES> DO NOT assume 2 decimal places, instead use the values set by the teacher for the item in question.
         $max = $boundary - (1 / pow(10, $decimals));
+        // </LSUGRADES>
+
     }
 
     print_grade_page_head($COURSE->id, 'letter', 'view', get_string('gradeletters', 'grades'));
@@ -107,9 +119,17 @@ if (!$edit) {
 
     $table = new html_table();
     $table->head  = array(get_string('max', 'grades'), get_string('min', 'grades'), get_string('letter', 'grades'));
+
+    // <LSUGRADES> Small changes to column widths.
     $table->size  = array('33%', '33%', '34%');
+    // </LSUGRADES>
+
     $table->align = array('left', 'left', 'left');
+
+    // <LSUGRADES> Small changes to column widths.
     $table->width = '40%';
+    // </LSUGRADES>
+
     $table->data  = $data;
     $table->tablealign  = 'center';
     echo html_writer::table($table);
@@ -127,17 +147,19 @@ if (!$edit) {
         $gradeboundaryname = 'gradeboundary'.$i;
 
         $data->$gradelettername   = $letter;
+
+        // <LSUGRADES> Either uses the standard grade boundary or uses the custom boundary rounded to the appropriate decimals
         $data->$gradeboundaryname = $custom ? format_float($boundary, $decimals) : (int) $boundary;
+        // </LSUGRADES>
+
         $i++;
     }
     $data->override = $DB->record_exists('grade_letters', array('contextid' => $context->id));
-
     $mform = new edit_letter_form($returnurl.$editparam, array('num'=>$num, 'admin'=>$admin));
     $mform->set_data($data);
 
     if ($mform->is_cancelled()) {
         redirect($returnurl);
-
     } else if ($data = $mform->get_data()) {
         if (!$admin and empty($data->override)) {
             $DB->delete_records('grade_letters', array('contextid' => $context->id));
@@ -154,15 +176,23 @@ if (!$edit) {
                 if ($letter == '') {
                     continue;
                 }
+
+                // <LSUGRADES> Hack to store non-integer decimal grade boundary data. Should this be done another way? I'm too lazy to figure it out. 
                 $stored = $custom ? "{$data->$gradeboundaryname}" : $data->$gradeboundaryname;
                 $letters[$stored] = $letter;
+		// </LSUGRADES>
+
             }
         }
         krsort($letters, SORT_NUMERIC);
 
+	// <LSUGRADES> Make sure letter grades and boundaries are set properly.
         $records = $DB->get_records('grade_letters', array('contextid' => $context->id), 'lowerboundary ASC', 'id');
+	// </LSUGRADES>
 
         foreach($letters as $boundary=>$letter) {
+
+	    // <LSUGRADES> Make sure letter grades and boundaries are set properly.
             $params = array(
                 'letter' => $letter,
                 'lowerboundary' => $boundary,
@@ -172,13 +202,21 @@ if (!$edit) {
             if ($record = $DB->get_record('grade_letters', $params)) {
                 unset($records[$record->id]);
                 continue;
+	    // </LSUGRADES>
+
             } else {
+
+	        // <LSUGRADES> Make sure letter grades and boundaries are set properly.
                 $record = (object) $params;
+	        // </LSUGRADES>
+
                 $DB->insert_record('grade_letters', $record);
             }
         }
 
+        // <LSUGRADES> Make sure letter grades and boundaries are set properly.
         $old_ids = array_keys($records);
+	// </LSUGRADES>
 
         foreach($old_ids as $old_id) {
             $DB->delete_records('grade_letters', array('id' => $old_id));

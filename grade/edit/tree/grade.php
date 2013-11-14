@@ -48,10 +48,12 @@ if (!$course = $DB->get_record('course', array('id' => $courseid))) {
     print_error('nocourseid');
 }
 
+// <LSUGRADES> Sanity check, make sure the course they're in supports anonymous grading if they're using anonymous grading.
 $p = array('itemid' => $itemid);
 if (grade_anonymous::is_supported($course) and grade_anonymous::fetch($p)) {
     print_error('anonymousnotallowed', 'grades');
 }
+// </LSUGRADES>
 
 $PAGE->set_pagelayout('incourse');
 require_login($course);

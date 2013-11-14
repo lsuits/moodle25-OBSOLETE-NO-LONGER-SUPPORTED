@@ -226,7 +226,9 @@ if ($current_view != '') {
 //Ideally we could do the updates through $grade_edit_tree to avoid recreating it
 $recreatetree = false;
 
+// <LSUGRADES> Set up curve to for future use.
 $curve_to = get_config('moodle', 'grade_multfactor_alt');
+// </LSUGRADES>
 
 if ($data = data_submitted() and confirm_sesskey()) {
     // Perform bulk actions first
@@ -271,9 +273,11 @@ if ($data = data_submitted() and confirm_sesskey()) {
 
             $grade_item = grade_item::fetch(array('id'=>$aid, 'courseid'=>$courseid));
 
+	    // <LSUGRADES> multfactor is determined by curve to / grademax for the item.
             if ($param === 'multfactor' and $curve_to) {
                 $value = $value / $grade_item->grademax;
             }
+	    // </LSUGRADES>
 
             if ($param === 'grademax' and $value < $grade_item->grademin) {
                 // better not allow values lower than grade min
@@ -294,7 +298,7 @@ if ($data = data_submitted() and confirm_sesskey()) {
 
             $grade_item = grade_item::fetch(array('id'=>$aid, 'courseid'=>$courseid));
 
-            // Weighted Mean special case
+            // <LSUGRADES> Weighted Mean special case to determine if an item is extra credit or not.
             $parent = $grade_item->load_parent_category();
 
             // Make sure about category item's parent category
@@ -316,6 +320,7 @@ if ($data = data_submitted() and confirm_sesskey()) {
             } else {
                 $grade_item->aggregationcoef = $value;
             }
+	    // </LSUGRADES>
 
             $grade_item->update();
             grade_regrade_final_grades($courseid);

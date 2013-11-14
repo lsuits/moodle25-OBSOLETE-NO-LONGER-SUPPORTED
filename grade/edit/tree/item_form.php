@@ -41,11 +41,13 @@ class edit_item_form extends moodleform {
 /// visible elements
         $mform->addElement('header', 'general', get_string('gradeitem', 'grades'));
 
+	// <LSUGRADES> Add the anonymous checkbox if the course category supports anonymous grading.
         if (grade_anonymous::is_supported($COURSE)) {
             $mform->addElement(
                 'checkbox', 'anonymous', get_string('anonymousitem', 'grades')
             );
         }
+	// </LSUGRADES>
 
         $mform->addElement('text', 'itemname', get_string('itemname', 'grades'));
         $mform->setType('itemname', PARAM_TEXT);
@@ -57,7 +59,12 @@ class edit_item_form extends moodleform {
         $mform->addHelpButton('idnumber', 'idnumbermod');
         $mform->setType('idnumber', PARAM_RAW);
 
-        $options = array(//GRADE_TYPE_NONE=>get_string('typenone', 'grades'),
+        $options = array(
+
+			 // <LSUGRADES> manual grade items should never have no-grade as an option. Here we remove the option for all grade items. This should probably be made a more granular administrative option nevertheless. 
+			 // GRADE_TYPE_NONE=>get_string('typenone', 'grades'),
+			 // </LSUGRADES> 
+
                          GRADE_TYPE_VALUE=>get_string('typevalue', 'grades'),
                          GRADE_TYPE_SCALE=>get_string('typescale', 'grades'),
                          GRADE_TYPE_TEXT=>get_string('typetext', 'grades'));
@@ -107,6 +114,7 @@ class edit_item_form extends moodleform {
         $mform->disabledIf('gradepass', 'gradetype', 'eq', GRADE_TYPE_TEXT);
         $mform->setType('gradepass', PARAM_RAW);
 
+	// <LSUGRADES> If curve to is enabled show it on the tree instead of multfactor and disable it when it's not appropritate. 
         if (get_config('moodle', 'grade_multfactor_alt')) {
             $curve_to = get_string('multfactor_alt', 'grades');
             $perform_curve = get_string('allow_multfactor_alt', 'grades');
@@ -126,6 +134,7 @@ class edit_item_form extends moodleform {
             $mform->addElement('text', 'multfactor', get_string('multfactor', 'grades'));
             $mform->addHelpButton('multfactor', 'multfactor', 'grades');
         }
+	// </LSUGRADES>
 
         $mform->setAdvanced('multfactor');
         $mform->disabledIf('multfactor', 'gradetype', 'eq', GRADE_TYPE_NONE);
@@ -250,6 +259,7 @@ class edit_item_form extends moodleform {
 
         if ($id = $mform->getElementValue('id')) {
 
+	    // <LSUGRADES> 
             if ($mform->elementExists('anonymous')) {
                 $anon = grade_anonymous::fetch(array('itemid' => $id));
 

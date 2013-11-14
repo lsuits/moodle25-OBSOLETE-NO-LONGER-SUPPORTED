@@ -31,7 +31,9 @@ require_once $CFG->libdir.'/formslib.php';
 class edit_letter_form extends moodleform {
 
     public function definition() {
+	// <LSUGRADES> TODO This is probably not necessary, please review.
         global $DB;
+	// </LSUGRADES>
 
         $mform =& $this->_form;
         $num   = $this->_customdata['num'];
@@ -48,13 +50,12 @@ class edit_letter_form extends moodleform {
         $gradeletter       = get_string('gradeletter', 'grades');
         $gradeboundary     = get_string('gradeboundary', 'grades');
 
-        $unused_str = get_string('unused', 'grades');
-
-        $percentages = array(-1 => $unused_str);
+	$percentages = array(-1 => get_string('unused', 'grades'));
         for ($i=100; $i > -1; $i--) {
             $percentages[$i] = "$i %";
         }
 
+        // <LSUGRADES> Laying the graundwork for custom letter percentages and strict letters 
         $custom = get_config('moodle', 'grade_letters_custom');
         $strict = get_config('moodle', 'grade_letters_strict');
 
@@ -69,16 +70,19 @@ class edit_letter_form extends moodleform {
         $default_letters = array_reverse(explode(',', $default_letters));
         $letters = array('' => get_string('unused', 'grades')) +
             array_combine($default_letters, $default_letters);
+	// </LSUGRADES>
 
         for($i=1; $i<$num+1; $i++) {
             $gradelettername = 'gradeletter'.$i;
             $gradeboundaryname = 'gradeboundary'.$i;
 
+	    // <LSUGRADES> if strict letter grades are set, show a select box, otherwise a text input.
             if ($strict) {
                 $mform->addElement('select', $gradelettername, $gradeletter." $i", $letters);
             } else {
                 $mform->addElement('text', $gradelettername, $gradeletter." $i");
             }
+	    //</LSUGRADES>
 
             if ($i == 1) {
                 $mform->addHelpButton($gradelettername, 'gradeletter', 'grades');
@@ -88,6 +92,7 @@ class edit_letter_form extends moodleform {
             if (!$admin) {
                 $mform->disabledIf($gradelettername, 'override', 'notchecked');
 
+	        // <LSUGRADES> If custom grade options are set, show the appropriate options and configuration values to admins and teachers.
                 if ($custom) {
                     $mform->disabledIf($gradeboundaryname, $gradelettername, 'eq', '');
                 } else {
@@ -107,6 +112,7 @@ class edit_letter_form extends moodleform {
 
                 $mform->setType($gradeboundaryname, PARAM_INT);
                 $mform->setDefault($gradeboundaryname, -1);
+                // </LSUGRADES>
             }
 
             if ($i == 1) {

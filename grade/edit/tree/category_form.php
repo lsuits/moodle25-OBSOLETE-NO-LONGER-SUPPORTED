@@ -86,15 +86,21 @@ class edit_category_form extends moodleform {
             $mform->setAdvanced('aggregatesubcats');
         }
 
+	// <LSUGRADES> Instead of a dropdown, use an input to set keephigh.
         $mform->addElement('text', 'keephigh', get_string('keephigh', 'grades'), 0);
         $mform->setType('keephigh', PARAM_INT);
+	// </LSUGRADES>
+
         $mform->addHelpButton('keephigh', 'keephigh', 'grades');
         if ((int)$CFG->grade_keephigh_flag & 2) {
             $mform->setAdvanced('keephigh');
         }
 
+        // <LSUGRADES> Instead of a dropdown, use an input to set droplow.
         $mform->addElement('text', 'droplow', get_string('droplow', 'grades'), 0);
         $mform->setType('droplow', PARAM_INT);
+	// </LSUGRADES>
+
         $mform->addHelpButton('droplow', 'droplow', 'grades');
         $mform->disabledIf('droplow', 'keephigh', 'noteq', 0);
         if ((int)$CFG->grade_droplow_flag & 2) {
@@ -174,6 +180,7 @@ class edit_category_form extends moodleform {
         $mform->disabledIf('grade_item_gradepass', 'grade_item_gradetype', 'eq', GRADE_TYPE_NONE);
         $mform->disabledIf('grade_item_gradepass', 'grade_item_gradetype', 'eq', GRADE_TYPE_TEXT);
 
+	// <LSUGRADES> Allows curve to usage instead of multfactor if option is administratively set.
         if (get_config('moodle', 'grade_multfactor_alt')) {
             $curve_to = get_string('multfactor_alt', 'grades');
             $perform_curve = get_string('allow_multfactor_alt', 'grades');
@@ -208,6 +215,7 @@ class edit_category_form extends moodleform {
         $mform->setAdvanced('grade_item_plusfactor');
         $mform->disabledIf('grade_item_plusfactor', 'gradetype', 'eq', GRADE_TYPE_NONE);
         $mform->disabledIf('grade_item_plusfactor', 'gradetype', 'eq', GRADE_TYPE_TEXT);
+	// </LSUGRADES>
 
         /// grade display prefs
         $default_gradedisplaytype = grade_get_setting($COURSE->id, 'displaytype', $CFG->grade_displaytype);
@@ -393,17 +401,20 @@ class edit_category_form extends moodleform {
                 $key = array_search('fullname', $mform->_required);
                 unset($mform->_required[$key]);
 
+		// <LSUGRADES> Check to see if a user can edit course category value.
                 $editable = (bool) get_config('moodle', 'grade_coursecateditable');
+		// </LSUGRADES>
 
-                // If it is a course category and its fullname is ?, show an empty field
+                // <LSUGRADES> If the course category is editable and its fullname is ?, show an empty field. If it is not editable, show the course fullname.
                 if ($editable && $mform->getElementValue('fullname') == '?') {
                     $mform->setDefault('fullname', '');
                 } else if (!$editable) {
                     $mform->setDefault('fullname', $COURSE->fullname);
                     $mform->hardFreeze('fullname');
                 }
-            }
+		// </LSUGRADES>
 
+            }
             // remove unwanted aggregation options
             if ($mform->elementExists('aggregation')) {
                 $allaggoptions = array_keys($this->aggregation_options);
@@ -496,11 +507,14 @@ class edit_category_form extends moodleform {
                 }
             }
         }
-        // Freeze grademin element if option unavailable
+
+        // <LSUGRADES> Freeze grademin element if grademin is administratively turned off.
         $min_is_hidden = (bool) get_config('moodle', 'grade_min_hide');
         if ($min_is_hidden and $mform->elementExists('grade_item_grademin')) {
             $mform->hardFreeze('grade_item_grademin');
         }
+	// </LSUGRADES>
+
     }
 
 /// perform extra validation before submission

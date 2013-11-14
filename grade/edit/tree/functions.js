@@ -70,7 +70,7 @@ function update_category_aggregation(e, args) {
 }
 
 
-
+// <LSUGRADES> Listen for grademax changes when curve-to is enabled and update curve-to accordingly.
 YUI().use("node-base", function(Y)
 {
     function add_grademax_change_listeners(){
@@ -126,7 +126,7 @@ YUI().use("node-base", function(Y)
         setup_curveto()
     );
 });
-
+// </LSUGRADES>
 
 /* TODO: finish and rewrite for YUI3...
 Y.YUI2.namespace('grade_edit_tree');
@@ -137,6 +137,7 @@ Y.YUI2.namespace('grade_edit_tree');
     var Event = Y.YUI2.util.Event;
     var gretree = Y.YUI2.grade_edit_tree;
 
+    // <LSUGRADES> Update curveto based on grademax and new grade.
     var curving = Dom.getElementsByClassName('curving', 'input');
     var changer = function(index, maxgrade) {
         return function() { curving[index].value = maxgrade.value; };
@@ -149,6 +150,7 @@ Y.YUI2.namespace('grade_edit_tree');
             maxgrade.onkeyup = changer(j, maxgrade);
         }
     }
+    // </LSUGRADES>
 
     gretree.DDApp = {
 

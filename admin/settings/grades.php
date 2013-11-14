@@ -23,13 +23,16 @@ if (has_capability('moodle/grade:manage', $systemcontext)
     $temp = new admin_settingpage('gradessettings', new lang_string('generalsettings', 'grades'), 'moodle/grade:manage');
     if ($ADMIN->fulltree) {
 
+	// <LSUGRADES> Allow anonymous grading setting. 
         $temp->add(new admin_setting_heading('grade_anonymous_header',
             get_string('anonymousgrading', 'grades'), ''));
 
         $temp->add(new admin_setting_configcheckbox('grade_anonymous_grading',
             get_string('anonymousgrading', 'grades'),
             get_string('anonymousgrading_help', 'grades'), 0));
+	// </LSUGRADES>
 
+	// LSUGRADES Limit anonymous grading to these categories. 
         $course_cats = $DB->get_records_menu(
             'course_categories', null, 'name ASC', 'id, name'
         );
@@ -38,7 +41,9 @@ if (has_capability('moodle/grade:manage', $systemcontext)
             get_string('anonymouscategories', 'grades'),
             get_string('anonymouscategories_help', 'grades'),
             array(), $course_cats));
+        // </LSUGRADES>
 
+	// LSUGRADES Determine the profile field used for anonymous grading. 
         $fields = $DB->get_records_menu(
             'user_info_field', null, 'name ASC', 'id, name'
         );
@@ -59,10 +64,14 @@ if (has_capability('moodle/grade:manage', $systemcontext)
                 get_string('anonymousfield', 'grades'),
                 get_string('anonymousfield_help', 'grades', $url->out())));
         }
+        // </LSUGRADES>
 
+	// LSUGRADES Define the adjustment value for anonymous grading.
+	// This is used when initial anonymous grading for a course is completed. 
         $temp->add(new admin_setting_configtext('grade_anonymous_adjusts',
             get_string('anonymousadjusts', 'grades'),
             get_string('anonymousadjusts_help', 'grades'), '0.0'));
+        // </LSUGRADES>
 
         $temp->add(new admin_setting_heading('grade_general_settings',
             get_string('generalsettings', 'grades'), ''));
@@ -117,7 +126,10 @@ if (has_capability('moodle/grade:manage', $systemcontext)
     /// Grade category settings
     $temp = new admin_settingpage('gradecategorysettings', new lang_string('gradecategorysettings', 'grades'), 'moodle/grade:manage');
     if ($ADMIN->fulltree) {
+
+	// <LSUGRADES> Setting used to determine if the course categoryname is editable or not. 
         $temp->add(new admin_setting_configcheckbox('grade_coursecateditable', new lang_string('coursecateditable', 'grades'), new lang_string('coursecateditable_help', 'grades'), 1));
+	// </LSUGRADES> 
 
         $temp->add(new admin_setting_configcheckbox('grade_hideforcedsettings', new lang_string('hideforcedsettings', 'grades'), new lang_string('hideforcedsettings_help', 'grades'), '1'));
 
@@ -143,13 +155,16 @@ if (has_capability('moodle/grade:manage', $systemcontext)
 
         $temp->add(new admin_setting_configmultiselect('grade_aggregations_visible', new lang_string('aggregationsvisible', 'grades'),
                                                        new lang_string('aggregationsvisiblehelp', 'grades'), $defaultvisible, $options));
-        // SWM Extra Credit handling
+        // <LSUGRADES> SWM Extra Credit handling
         $temp->add(new admin_setting_configcheckbox('grade_swm_extra_credit', new lang_string('swm_ec', 'grades'), new lang_string('swm_ec_help', 'grades'), '1'));
+        // </LSUGRADES>
 
         $options = array(0 => new lang_string('no'), 1 => new lang_string('yes'));
 
+        // <LSUGRADES> Option to stop teachers from overriding grade category totals.
         $temp->add(new admin_setting_configcheckbox('grade_overridecat', new lang_string('overridecat', 'grades'),
             new lang_string('overridecat_help', 'grades'), 1));
+        // </LSUGRADES>
 
         $defaults = array('value'=>1, 'forced'=>false, 'adv'=>true);
         $temp->add(new admin_setting_gradecat_combo('grade_aggregateonlygraded', new lang_string('aggregateonlygraded', 'grades'),
@@ -173,10 +188,13 @@ if (has_capability('moodle/grade:manage', $systemcontext)
         $temp->add(new admin_setting_gradecat_combo('grade_droplow', new lang_string('droplow', 'grades'),
                     new lang_string('droplow_help', 'grades'), $defaults, $options));
 
+        // <LSUGRADES> Option to stop teachers from overriding grade category totals.
         $temp->add(new admin_setting_configcheckbox('grade_droplow_limit',
             new lang_string('droplow_limit', 'grades'),
             new lang_string('droplow_limit_help', 'grades'), 0)
         );
+	// </LSUGRADES>
+
     }
     $ADMIN->add('grades', $temp);
 
@@ -184,13 +202,18 @@ if (has_capability('moodle/grade:manage', $systemcontext)
     /// Grade item settings
     $temp = new admin_settingpage('gradeitemsettings', new lang_string('gradeitemsettings', 'grades'), 'moodle/grade:manage');
     if ($ADMIN->fulltree) {
+
+	// <LSUGRADES> Setting to use curve-to instead of multfactor
         $temp->add(new admin_setting_configcheckbox('grade_multfactor_alt',
             new lang_string('multfactor_alt', 'grades'),
             new lang_string('multfactor_alt_desc', 'grades'), 0));
+	// </LSUGRADES>
 
+	// <LSUGRADES> Setting to turn on manual item recomputes so manual items have rawgrades as well as final grades.
         $temp->add(new admin_setting_configcheckbox('grade_item_manual_recompute',
             new lang_string('gradeitemmanualrecompute', 'grades'),
             new lang_string('gradeitemmanualrecompute_help', 'grades'), 0));
+	// </LSUGRADES>
 
         $temp->add(new admin_setting_configselect('grade_displaytype', new lang_string('gradedisplaytype', 'grades'),
                                                   new lang_string('gradedisplaytype_help', 'grades'), GRADE_DISPLAY_TYPE_REAL, $display_types));
@@ -224,7 +247,10 @@ if (has_capability('moodle/grade:manage', $systemcontext)
                                                              'aggregationcoef' => new lang_string('aggregationcoef', 'grades'),
                                                              'parentcategory' => new lang_string('parentcategory', 'grades'))));
 
+	// <LSUGRADES> Setting for hiding minimum grade.
         $temp->add(new admin_setting_configcheckbox('grade_min_hide', new lang_string('minimum_hide', 'grades'), new lang_string('minimum_hide_help', 'grades'), '0'));
+        // </LSUGRADES>
+
     }
     $ADMIN->add('grades', $temp);
 
@@ -238,12 +264,15 @@ if (has_capability('moodle/grade:manage', $systemcontext)
         $ADMIN->add('grades', $outcomes);
     }
 
+    // <LSUGRADES> Custom percentage letter grades.
     $letters_str = new lang_string('letters', 'grades');
     $letters_base = $CFG->wwwroot.'/grade/edit/letter';
     $letters = new admin_externalpage('letters', $letters_str, $letters_base . '/index.php', 'moodle/grade:manageletters');
+    // </LSUGRADES>
 
     $ADMIN->add('grades', $letters);
 
+    // <LSUGRADES> Custom percentage letter grades.
     $letters_settings_str = new lang_string('letter', 'grades') . ' ' . new lang_string('edit') . ' ' . new lang_string('settings');
     $temp = new admin_settingpage('letterssettings', $letters_settings_str, 'moodle/grade:manageletters');
     if ($ADMIN->fulltree) {
@@ -264,6 +293,7 @@ if (has_capability('moodle/grade:manage', $systemcontext)
             new lang_string('lettersname_help', 'grades'), 0, $scales));
     }
     $ADMIN->add('grades', $temp);
+    // </LSUGRADES>
 
     // The plugins must implement a settings.php file that adds their admin settings to the $settings object
 

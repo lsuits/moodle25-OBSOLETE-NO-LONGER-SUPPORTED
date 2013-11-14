@@ -49,9 +49,12 @@ require_capability('moodle/grade:manage', $context);
 $gpr = new grade_plugin_return();
 $returnurl = $gpr->get_return_url('index.php?id='.$course->id);
 
+
 $heading = get_string('categoryedit', 'grades');
 
+// <LSUGRADES> Set up to use curve to later on.
 $curve_to = get_config('moodle', 'grade_multfactor_alt');
+// </LSUGRADES>
 
 if ($id) {
     if (!$grade_category = grade_category::fetch(array('id'=>$id, 'courseid'=>$course->id))) {
@@ -98,6 +101,7 @@ if ($id) {
     }
 }
 
+// <LSUGRADES> Determine if curve to is set. If so generate multfactor based on curve to value and the max grade for the item.
 $multfactor = $grade_item->multfactor;
 $curve_decimals = 4;
 $decimalpoints = $grade_item->get_decimals();
@@ -108,6 +112,7 @@ if ($curve_to) {
 }
 
 $category->grade_item_multfactor = format_float($multfactor, $curve_decimals);
+// </LSUGRADES>
 
 $mform = new edit_category_form(null, array('current'=>$category, 'gpr'=>$gpr));
 
@@ -178,7 +183,7 @@ if ($mform->is_cancelled()) {
         }
     }
 
-    // Special handling of curve to
+    // <LSUGRADES> Special handling of curve to. If curve to, divide curve-to by grademax to get multfactor.
     if ($curve_to) {
         if (empty($itemdata->multfactor) || $itemdata->multfactor <= 0.0000) {
             $itemdata->multfactor = 1.0000;
@@ -188,6 +193,7 @@ if ($mform->is_cancelled()) {
             $itemdata->multfactor = $itemdata->multfactor / $itemdata->grademax;
         }
     }
+    // </LSUGRADES> 
 
     // When creating a new category, a number of grade item fields are filled out automatically, and are required.
     // If the user leaves these fields empty during creation of a category, we let the default values take effect

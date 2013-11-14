@@ -40,10 +40,12 @@ class edit_scale_form extends moodleform {
         $mform->addRule('name', get_string('required'), 'required', null, 'client');
         $mform->setType('name', PARAM_TEXT);
 
+        // <LSUGRADES> Deny non-course-creators from creating standard scales. TODO This may not be necessary, if it is, this should be an administrative setting.
         if (has_capability('moodle/course:create', get_context_instance(CONTEXT_SYSTEM))) {
             $mform->addElement('advcheckbox', 'standard', get_string('scalestandard'));
             $mform->addHelpButton('standard', 'scalestandard');
         }
+	// </LSUGRADES>
 
         $mform->addElement('static', 'used', get_string('used'));
 
@@ -90,7 +92,10 @@ class edit_scale_form extends moodleform {
             if (empty($courseid)) {
                 $mform->hardFreeze('standard');
 
+            // <LSUGRADES> Deny non-course-creators from creating standard scales. TODO This may not be necessary, if it is, this should be an administrative setting.
             } else if (!has_capability('moodle/course:create', context_system::instance())) {
+            // </LSUGRADES>
+
                 //if they dont have managescales at system level the shouldnt be allowed to make scales standard (or not standard)
                 $mform->hardFreeze('standard');
 

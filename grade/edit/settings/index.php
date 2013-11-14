@@ -60,17 +60,25 @@ if ($mform->is_cancelled()) {
 
 } else if ($data = $mform->get_data()) {
     $data = (array)$data;
+
+    // <LSUGRADES> Add anonymous adjustment values.
     $general = array('displaytype', 'decimalpoints', 'anonymous_adjusts', 'aggregationposition');
+    // </LSUGRADES>
+
     foreach ($data as $key=>$value) {
         if (!in_array($key, $general) and strpos($key, 'report_') !== 0
                                       and strpos($key, 'import_') !== 0
                                       and strpos($key, 'export_') !== 0) {
             continue;
         }
+
+	// <LSUGRADES> make sure there's something valid set for anonymous adjust. If not, set it to -1, which then nulls it out.
         if ($key == 'anonymous_adjusts' and
             !is_numeric($value) or trim($value) === '') {
             $value = -1;
         }
+	// </LSUGRADES>
+
         if ($value == -1) {
             $value = null;
         }

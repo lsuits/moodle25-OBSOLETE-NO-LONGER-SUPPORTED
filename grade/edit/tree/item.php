@@ -38,9 +38,11 @@ if ($id !== 0) {
 $PAGE->set_url($url);
 $PAGE->set_pagelayout('admin');
 
+// <LSUGRADES> make sure a courseid is set. 
 if (!$course = $DB->get_record('course', array('id' => $courseid))) {
     print_error('nocourseid');
 }
+// </LSUGRADES>
 
 require_login($course);
 $context = context_course::instance($course->id);
@@ -52,7 +54,9 @@ $returnurl = $gpr->get_return_url('index.php?id='.$course->id);
 
 $heading = get_string('itemsedit', 'grades');
 
+// <LSUGRADES> Set up curve to for future use.
 $curve_to = get_config('moodle', 'grade_multfactor_alt');
+// </LSUGRADES>
 
 if ($grade_item = grade_item::fetch(array('id'=>$id, 'courseid'=>$courseid))) {
     // redirect if outcomeid present
@@ -88,6 +92,7 @@ if ($item->hidden > 1) {
 
 $item->locked = !empty($item->locked);
 
+// <LSUGRADES> If we're using curve to, set decimal places according to system and teacher settings. If not, set them to 4 places.
 $multfactor = $item->multfactor;
 $curve_decimals = 4;
 
@@ -95,11 +100,16 @@ if ($curve_to) {
     $curve_decimals = $decimalpoints;
     $multfactor *= $item->grademax;
 }
+// </LSUGRADES>
 
 $item->grademax        = format_float($item->grademax, $decimalpoints);
 $item->grademin        = format_float($item->grademin, $decimalpoints);
 $item->gradepass       = format_float($item->gradepass, $decimalpoints);
+
+// <LSUGRADES> If we're using curve to, set decimal places according to system and teacher settings. If not, set them to 4 places.
 $item->multfactor      = format_float($multfactor, $curve_decimals);
+// </LSUGRADES>
+
 $item->plusfactor      = format_float($item->plusfactor, 4);
 
 if ($parent_category->aggregation == GRADE_AGGREGATE_SUM or $parent_category->aggregation == GRADE_AGGREGATE_WEIGHTED_MEAN2) {
@@ -149,7 +159,7 @@ if ($mform->is_cancelled()) {
         }
     }
 
-    // Special handling of curve to
+    // <LSUGRADES> Special handling of curve to to determine multfactor based on grademax for storage.
     if ($curve_to) {
         if (empty($data->multfactor) || $data->multfactor <= 0.0000) {
             $data->multfactor = 1.0000;
@@ -159,10 +169,15 @@ if ($mform->is_cancelled()) {
             $data->multfactor = $data->multfactor / $data->grademax;
         }
     }
+    // </LSUGRADES>
 
     $grade_item = new grade_item(array('id'=>$id, 'courseid'=>$courseid));
     grade_item::set_properties($grade_item, $data);
+
+    // <LSUGRADES> Unset anonymous item.
     unset($grade_item->anonymous);
+    // </LSUGRADES>
+
     $grade_item->outcomeid = null;
 
     // Handle null decimals value
@@ -174,7 +189,7 @@ if ($mform->is_cancelled()) {
         $grade_item->itemtype = 'manual'; // all new items to be manual only
         $grade_item->insert();
 
-        // Anonymous check
+        // <LSUGRADES> Check for anonymous checkbox. If it's checked create and anonymous item.
         if (isset($data->anonymous) and grade_anonymous::is_supported($course)) {
             $anon = new grade_anonymous(array('itemid' => $grade_item->id));
 
@@ -182,6 +197,7 @@ if ($mform->is_cancelled()) {
                 $anon->insert();
             }
         }
+	// </LSUGRADES>
 
         // set parent if needed
         if (isset($data->parentcategory)) {

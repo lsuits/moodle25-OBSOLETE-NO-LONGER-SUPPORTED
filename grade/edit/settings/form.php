@@ -35,7 +35,10 @@ require_once($CFG->libdir.'/formslib.php');
 class course_settings_form extends moodleform {
 
     function definition() {
+
+	// <LSUGRADES> Adding $COURSE to get course category to determine if course can be anonymously graded.
         global $USER, $CFG, $COURSE;
+	// </LSUGRADES>
 
         $mform =& $this->_form;
 
@@ -65,13 +68,15 @@ class course_settings_form extends moodleform {
         $mform->addElement('select', 'aggregationposition', get_string('aggregationposition', 'grades'), $options);
         $mform->addHelpButton('aggregationposition', 'aggregationposition', 'grades');
 
-        // Anonymous settings
+        // <LSUGRADES> Anonymous grade adjustment settings. 
         if (grade_anonymous::is_supported($COURSE) and $can_view_admin_links) {
             $mform->addElement('text', 'anonymous_adjusts',
                 get_string('anonymousadjusts', 'grades'));
             $mform->setDefault('anonymous_adjusts', $CFG->grade_anonymous_adjusts);
             $mform->addHelpButton('anonymous_adjusts', 'anonymousadjusts', 'grades');
+            $mform->setType('anonymous_adjusts', PARAM_FLOAT);
         }
+	// </LSUGRADES>
 
         // Grade item settings
         $mform->addElement('header', 'grade_item_settings', get_string('gradeitemsettings', 'grades'));
