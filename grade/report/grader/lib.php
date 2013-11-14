@@ -1080,7 +1080,7 @@ class grade_report_grader extends grade_report {
                 }
 
                 if ($grade->is_excluded()) {
-                    // $itemcell->attributes['class'] .= ' excluded';
+                    $itemcell->attributes['class'] .= ' excluded';
                 }
 
                 if (!empty($grade->feedback)) {
@@ -1090,6 +1090,10 @@ class grade_report_grader extends grade_report {
 
                 if ($grade->is_excluded()) {
                     $itemcell->text .= html_writer::tag('span', get_string('excluded', 'grades'), array('class'=>'excludedfloater'));
+                }
+
+                if ($grade->is_overridden() && !$grade->is_excluded()) {
+                    $itemcell->text .= html_writer::tag('span', get_string('overridden', 'grades'), array('class'=>'excludedfloater'));
                 }
 
                 // Do not show any icons if no grade (no record in DB to match)
