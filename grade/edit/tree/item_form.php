@@ -259,7 +259,7 @@ class edit_item_form extends moodleform {
 
         if ($id = $mform->getElementValue('id')) {
 
-	    // <LSUGRADES> 
+	    // <LSUGRADES> freeze or hide the anonymous item checkbox depending on if the item is anonymous or not. We don't want people changing anonymous items to non-anonymous and back.  
             if ($mform->elementExists('anonymous')) {
                 $anon = grade_anonymous::fetch(array('itemid' => $id));
 
@@ -270,6 +270,7 @@ class edit_item_form extends moodleform {
                     $mform->removeElement('anonymous');
                 }
             }
+	    // </LSUGRADES>
 
             $grade_item = grade_item::fetch(array('id'=>$id));
 
@@ -277,9 +278,12 @@ class edit_item_form extends moodleform {
                 $mform->removeElement('plusfactor');
                 $mform->removeElement('multfactor');
 
+		// <LSUGRADES> if there is a curve to item, remove it for grade items that do not use rawgrades.
                 if ($mform->elementExists('curve_to')) {
                     $mform->removeElement('curve_to');
                 }
+		// </LSUGRADES>
+
             }
 
             if ($grade_item->is_outcome_item()) {
@@ -360,11 +364,13 @@ class edit_item_form extends moodleform {
             $mform->removeElement('headerparent');
         }
 
-        // Freeze grademin element if option unavailable
+        // <LSUGRADES> Freeze grademin element if option unavailable
         $min_is_hidden = (bool) get_config('moodle', 'grade_min_hide');
         if ($min_is_hidden and $mform->elementExists('grademin')) {
             $mform->hardFreeze('grademin');
         }
+	// </LSUGRADES>
+
     }
 
 

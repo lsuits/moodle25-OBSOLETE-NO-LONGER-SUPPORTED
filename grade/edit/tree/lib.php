@@ -55,8 +55,10 @@ class grade_edit_tree {
     public function __construct($gtree, $moving=false, $gpr) {
         global $USER, $OUTPUT, $COURSE;
 
+	// <LSUGRADES> set up the show calculations preference for future use.
         $system_default = get_config('moodle', 'grade_report_showcalculations');
         $this->show_calculations = get_user_preferences('grade_report_showcalculations', $system_default);
+	// </LSUGRADES>
 
         $this->gtree = $gtree;
         $this->moving = $moving;
@@ -141,9 +143,11 @@ class grade_edit_tree {
             $actions .= $this->gtree->get_edit_icon($element, $this->gpr);
         }
 
+	// <LSUGRADES> if calculations are to be shown, show the calculations icon.
         if ($this->show_calculations) {
             $actions .= $this->gtree->get_calculation_icon($element, $this->gpr);
         }
+	// </LSUGRADES>
 
         if ($element['type'] == 'item' or ($element['type'] == 'category' and $element['depth'] > 1)) {
             if ($this->element_deletable($element)) {
@@ -373,9 +377,11 @@ class grade_edit_tree {
         if ((($aggcoef == 'aggregationcoefweight' || $aggcoef == 'aggregationcoef') && $type == 'weight') ||
             ($aggcoef == 'aggregationcoefextraweight' && $type == 'extra')) {
 
+	    // <LSUGRADES> checks if weight is negative for non-extra credit items. If so, ignore the negative.
             if ($aggcoef == 'aggregationcoefweight' && $item->aggregationcoef < 0) {
                 return '';
             }
+	    // </LSUGRADES>
 
             return '<label class="accesshide" for="aggregationcoef_'.$item->id.'">'.
                 get_string('extracreditvalue', 'grades', $item->itemname).'</label>'.
