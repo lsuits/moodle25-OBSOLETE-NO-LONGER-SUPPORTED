@@ -38,12 +38,8 @@ if ($id !== 0) {
 $PAGE->set_url($url);
 $PAGE->set_pagelayout('admin');
 
-if (!$courseid = $COURSE->id) {
-    if(!$course = $DB->get_record('course', array('id' => $courseid))){
-        print_error('nocourseid');
-    }
-}else{
-    $course = $COURSE;
+if(!$course = $DB->get_record('course', array('id' => $courseid))){
+    print_error('nocourseid');
 }
 
 require_login($course);
