@@ -34,5 +34,8 @@ $string['pluginname'] = 'Grader report';
 $string['preferences'] = 'Grader report preferences';
 $string['useractivitygrade'] = '{$a} grade';
 $string['useractivityfeedback'] = '{$a} feedback';
+
+// <LSUGRADES> Lang strings for quick edit.
 $string['quick_edit'] = 'Integrate Quick Edit';
 $string['quick_edit_desc'] = 'Creates _Quick edit_ links in the grader report.';
+// </LSUGRADES>

@@ -387,9 +387,13 @@ class grade_edit_tree {
                 get_string('extracreditvalue', 'grades', $item->itemname).'</label>'.
                 '<input type="text" size="6" id="aggregationcoef_'.$item->id.'" name="aggregationcoef_'.$item->id.'"
                 value="'.grade_edit_tree::format_number($item->aggregationcoef).'" />';
+
+	// <LSUGRADES> Checks if aggregation coeefficient is weigthed or not on extra credit items.
         } elseif (($aggcoef == 'aggregationcoefextrasum' || $aggcoef == 'aggregationcoefweight') && $type == 'extra') {
             $valid = ($aggcoef != 'aggregationcoefweight' and $item->aggregationcoef > 0);
             $checked = ($valid or $item->aggregationcoef < 0) ? 'checked="checked"' : '';
+	// </LSUGRADES>
+
             return '<input type="hidden" name="extracredit_'.$item->id.'" value="0" />
                 <label class="accesshide" for="extracredit_'.$item->id.'">'.
                 get_string('extracreditvalue', 'grades', $item->itemname).'</label>
@@ -493,7 +497,11 @@ class grade_edit_tree {
         if ($element['type'] == 'category') {
             if ($coefstring == 'aggregationcoefweight') {
                 $this->uses_weight = true;
+
+		// <LSUGRADES> ensures that weghted mean of grades uses extra credit.
                 $this->uses_extra_credit = true;
+		// </LSUGRADES>
+
             } elseif ($coefstring ==  'aggregationcoefextraweight' || $coefstring == 'aggregationcoefextrasum') {
                 $this->uses_extra_credit = true;
             }
@@ -810,7 +818,11 @@ class grade_edit_tree_column_range extends grade_edit_tree_column {
 
     public function get_item_cell($item, $params) {
         global $DB, $OUTPUT;
+
+	// <LSUGRADES> Check settings and set up curve to for future use.
         $this->curve_to = get_config('moodle', 'grade_multfactor_alt');
+	// </LSUGRADES>
+
         // If the parent aggregation is Sum of Grades, this cannot be changed
         $parent_cat = $item->get_parent_category();
         if ($parent_cat->aggregation == GRADE_AGGREGATE_SUM) {
@@ -827,6 +839,8 @@ class grade_edit_tree_column_range extends grade_edit_tree_column {
         } elseif ($item->is_external_item()) {
             $grademax = format_float($item->grademax, $item->get_decimals());
         } else {
+
+	    // <LSUGRADES> If we're using curve to, add a class 'grademax' so we can use JS to change the curve to value according to the item's grademax.
             if ($this->curve_to) {
                 $grademax = '<label class="accesshide" for="grademax'.$item->id.'">'.get_string('grademax', 'grades').'</label>
                     <input type="text" size="6" id="grademax'.$item->id.'" class="grademax" name="grademax_'.$item->id.'" value="'.
@@ -836,6 +850,8 @@ class grade_edit_tree_column_range extends grade_edit_tree_column {
                     <input type="text" size="6" id="grademax'.$item->id.'" name="grademax_'.$item->id.'" value="'.
                     format_float($item->grademax, $item->get_decimals()).'" />';
             }
+	    // </LSUGRADES>
+
         }
 
         $itemcell = clone($this->itemcell);
@@ -997,7 +1013,8 @@ class grade_edit_tree_column_droplow extends grade_edit_tree_column_category {
     }
 
     public function get_category_cell($category, $levelclass, $params) {
-        // HIDE THIS
+
+        // <LSUGRADES> Hide drop lowest grades if keep highest is in use.
         // $droplow = '<label class="accesshide" for="droplow_' . $category->id.'">' . get_string('droplowestvalue', 'grades') . '</label>';
         $disabled = '';
         if (!empty($category->keephigh)) {
@@ -1005,6 +1022,7 @@ class grade_edit_tree_column_droplow extends grade_edit_tree_column_category {
         }
 
         $droplow = '<input '.$disabled.' type="text" size="3" id="droplow_'.$category->id.'" name="droplow_'.$category->id.'" value="'.$category->droplow.'" />';
+	// </LSUGRADES>
 
         if ($this->forced) {
             $droplow = $category->droplow;
@@ -1037,7 +1055,8 @@ class grade_edit_tree_column_keephigh extends grade_edit_tree_column_category {
     }
 
     public function get_category_cell($category, $levelclass, $params) {
-        // HIDE THIS
+
+        // <LSUGRADES> Hide keep highest grades if drop lowest is in use.
         // $keephigh = '<label class="accesshide" for="keephigh_'.$category->id.'">'.get_string('keephigh', 'grades').'</label>';
         $disabled = '';
         if (!empty($category->droplow)) {
@@ -1045,6 +1064,7 @@ class grade_edit_tree_column_keephigh extends grade_edit_tree_column_category {
         }
 
         $keephigh = '<input '.$disabled.' type="text" size="3" id="keephigh_'.$category->id.'" name="keephigh_'.$category->id.'" value="'.$category->keephigh.'" />';
+	// </LSUGRADES>
 
         if ($this->forced) {
             $keephigh = $category->keephigh;
@@ -1064,10 +1084,17 @@ class grade_edit_tree_column_keephigh extends grade_edit_tree_column_category {
 }
 
 class grade_edit_tree_column_multfactor extends grade_edit_tree_column {
+
+    // <LSUGRADES> We need this for curve to use.
     private $curve_to;
+    // </LSUGRADES>
 
     public function __construct($params) {
+
+	// <LSUGRADES> Check to see if curve to is enabled.
         $this->curve_to = get_config('moodle', 'grade_multfactor_alt');
+	// </LSUGRADES>
+
         parent::__construct();
     }
 
@@ -1075,9 +1102,11 @@ class grade_edit_tree_column_multfactor extends grade_edit_tree_column {
         global $OUTPUT;
         $headercell = clone($this->headercell);
 
+	// <LSUGRADES> Change the header title depending on curve to being enabled.
         $name = $this->curve_to ? 'multfactor_alt' : 'multfactor';
-
         $headercell->text = get_string($name, 'grades').$OUTPUT->help_icon($name, 'grades');
+	// </LSUGRADES>
+
         return $headercell;
     }
 
@@ -1096,6 +1125,8 @@ class grade_edit_tree_column_multfactor extends grade_edit_tree_column {
             $itemcell->text = '&nbsp;';
             return $itemcell;
         }
+
+	// <LSUGRADES> if curve-to is enabled, make the box a bit bigger and do the math for curve to accordingly.
         $size = 4;
         $multfactor = $item->multfactor;
 
@@ -1119,6 +1150,8 @@ class grade_edit_tree_column_multfactor extends grade_edit_tree_column {
         $multfactor = html_writer::empty_tag('input', $params);
 
         $itemcell->text .= $multfactor;
+	// </LSUGRADES>
+
         return $itemcell;
     }
 

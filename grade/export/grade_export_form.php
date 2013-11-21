@@ -151,9 +151,12 @@ class grade_export_form extends moodleform {
             }
         }
 
+	// <LSUGRADES> Adds a ferpa compliance checkbox for exporting.
         $mform->addElement('header', 'ferpa_header', get_string('ferpa_title', 'grades'));
         $mform->addElement('checkbox', 'ferpa_required', null, get_string('ferpa_required', 'grades'));
         $mform->addRule('ferpa_required', get_string('missing_ferpa_required', 'grades'), 'required');
+	// </LSUGRADES>
+
         $mform->addElement('hidden', 'id', $COURSE->id);
         $mform->setType('id', PARAM_INT);
         $this->add_action_buttons(false, get_string('submit'));

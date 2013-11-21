@@ -95,7 +95,9 @@ class grade_report_grader extends grade_report {
      */
     protected $feedback_trunc_length = 50;
 
+    // <LSUGRADES> Set up an array for item / category total weights to be shown in the grader report.
     protected $weightedtotals = array();
+    // </LSUGRADES>
 
     /**
      * Constructor. Sets local copies of user preferences and initialises grade_tree.
@@ -133,8 +135,9 @@ class grade_report_grader extends grade_report {
         // Grab the grade_tree for this course
         $this->gtree = new grade_tree($this->courseid, true, $switch, $this->collapsed, $nooutcomes);
 
-        // Load Anonymous items
+            // <SLUGRADES> Load Anonymous items
             $this->load_anonymous();
+	    // </LSUGRADES>
 
         $this->sortitemid = $sortitemid;
 
@@ -147,20 +150,26 @@ class grade_report_grader extends grade_report {
             $this->baseurl->params(array('perpage' => $studentsperpage, 'page' => $this->page));
         }
 
+	// <LSUGRADES> Set up the initialbar.
         $this->setup_name_filters();
+	// </LSUGRADES>
 
-        // Persist initials through paging
+        // <LSUGRADES> Persist initials through paging.
         $this->pbarurl = new moodle_url('/grade/report/grader/index.php', array(
             'id' => $this->courseid,
             'silast' => $this->silast,
             'filast' => $this->filast
         ));
+	// </LSUGRADES>
 
         $this->setup_groups();
 
         $this->setup_sortitemid();
 
+        // <LSUGRADES> Check to see if the teacher can override category totals.
         $this->overridecat = (bool)get_config('moodle', 'grade_overridecat');
+	// </LSUGRADES>
+
     }
 
     /**
@@ -446,6 +455,7 @@ class grade_report_grader extends grade_report {
             $params = array_merge($gradebookrolesparams, $this->groupwheresql_params, $enrolledparams);
         }
 
+	// <LSUGRADES> Set up the SQL for the initialbar.
         $wherenames = $this->name_filters();
 
         $sql = "SELECT $userfields
@@ -463,6 +473,7 @@ class grade_report_grader extends grade_report {
                    $wherenames
                    $this->groupwheresql
               ORDER BY $sort";
+	// </LSUGRADES>
 
         $studentsperpage = $this->get_students_per_page();
         $this->users = $DB->get_records_sql($sql, $params, $studentsperpage * $this->page, $studentsperpage);
@@ -663,9 +674,13 @@ class grade_report_grader extends grade_report {
         if (has_capability('gradereport/'.$CFG->grade_profilereport.':view', $this->context)) {
             $colspan++;
         }
+
+	// <LSUGRADES> If quick edit integration is turned on, increment colspan for the students.
         if ($this->get_pref('integrate_quick_edit')) {
             $colspan++;
         }
+	// </LSUGRADES>
+
         $colspan += count($extrafields);
 
         $levels = count($this->gtree->levels) - 1;
@@ -690,9 +705,13 @@ class grade_report_grader extends grade_report {
         if (has_capability('gradereport/'.$CFG->grade_profilereport.':view', $this->context)) {
             $studentheader->colspan = 2;
         }
+
+	// <LSUGRADES> If quick edit integration is turned on, increment colspan for the students.
         if ($this->get_pref('integrate_quick_edit')) {
             $studentheader->colspan++;
         }
+	// </LSUGRADES>
+
         $studentheader->text = $arrows['studentname'];
 
         $headerrow->cells[] = $studentheader;
@@ -713,24 +732,31 @@ class grade_report_grader extends grade_report {
 
         $rowclasses = array('even', 'odd');
 
+	// <LSUGRADES> Check the repeat header setting and save it for future use. This allows the admin and end user to repeat headers every N rows.
         $repeat = $this->get_pref('repeatheaders');
+	// </LSUGRADES>
 
-        // Repeat filler
+        // <LSUGRADES> Repeat filler for repeat headers by cloning the header rows and removing the topmost row.
         $repeatentries = unserialize(serialize($rows));
         array_shift($repeatentries);
+	// </LSUGRADES>
 
         $suspendedstring = null;
         foreach ($this->users as $userid => $user) {
+
+	    // <LSUGRADES> If there are rows and repeat is enabled, deeply clone the repeated headers and merge them into the left rows.
             if ($this->rowcount > 0 and $this->rowcount % $repeat == 0) {
                 $rows = array_merge($rows, unserialize(serialize($repeatentries)));
             }
-
             $this->rowcount++;
+	    // </LSUGRADES>
 
             $userrow = new html_table_row();
-
             $userrow->id = 'fixed_user_'.$userid;
+
+	    // <LSUGRADES> Assign the appropriate header class to the repeated headers. 
             $userrow->attributes['class'] = $rowclasses[$this->rowcount % 2];
+	    // </LSUGRADES> 
 
             $usercell = new html_table_cell();
             $usercell->attributes['class'] = 'user';
@@ -756,6 +782,7 @@ class grade_report_grader extends grade_report {
 
             $userrow->cells[] = $usercell;
 
+	    // <LSUGRADES> If quick edit integration is turned on, add QE to the user where appropriate.
             if ($this->get_pref('integrate_quick_edit')) {
                 $quickeditcell = new html_table_cell();
                 $quickeditcell->attributes['class'] = 'quickedituser';
@@ -772,6 +799,7 @@ class grade_report_grader extends grade_report {
                 $quickeditcell->text = html_writer::link($url, 'QE');
                 $userrow->cells[] = $quickeditcell;
             }
+	    // </LSUGRADES>
 
             if (has_capability('gradereport/'.$CFG->grade_profilereport.':view', $this->context)) {
                 $userreportcell = new html_table_cell();
@@ -830,7 +858,9 @@ class grade_report_grader extends grade_report {
         );
         $jsscales = array();
 
+	// <LSUGRADES> Set up percentages for future use.
         $render_percents = $this->get_pref('showweightedpercents');
+	// </LSUGRADES>
 
         foreach ($this->gtree->get_levels() as $key=>$row) {
             if ($key == 0) {
@@ -907,6 +937,7 @@ class grade_report_grader extends grade_report {
                         $arrow = $this->get_sort_arrow('move', $sortlink);
                     }
 
+		    // <LSUGRADES> Add the QE link to the grade items if quick edit integration is turned on.
                     $is_category_item = (
                         $element['object']->itemtype == 'course' or
                         $element['object']->itemtype == 'category'
@@ -938,23 +969,30 @@ class grade_report_grader extends grade_report {
                     } else {
                         $qe_link = '';
                     }
+		    // </LSUGRADES>
 
                     $headerlink = $this->gtree->get_element_header($element, true, $this->get_pref('showactivityicons'), false);
 
                     $itemcell = new html_table_cell();
                     $itemcell->attributes['class'] = $type . ' ' . $catlevel . ' highlightable';
 
+		    // <LSUGRADES> Get the appropriate percentage of the item.
                     $percents = $render_percents ?
                         $this->get_weighted_percents($element['object']) : '';
+		    // </LSUGRADES>
 
                     if ($element['object']->is_hidden()) {
                         $itemcell->attributes['class'] .= ' dimmed_text';
                     }
 
                     $itemcell->colspan = $colspan;
+
+		    // <LSUGRADES> Add QE text where appropriate and add the item weighted percentage where appropriate.
                     $itemcell->text = $qe_link;
                     $itemcell->text .= shorten_text($headerlink);
                     $itemcell->text .= $percents . $arrow;
+		    // </LSUGRADES>
+
                     $itemcell->header = true;
                     $itemcell->scope = 'col';
 
@@ -991,17 +1029,21 @@ class grade_report_grader extends grade_report {
 
         $rowclasses = array('even', 'odd');
 
+	// <LSUGRADES> 
         $repeat = $this->get_pref('repeatheaders');
 
         // Headers to repeat
         $repeatentries = unserialize(serialize($rows));
         array_shift($repeatentries);
+	// </LSUGRADES>
 
         foreach ($this->users as $userid => $user) {
 
+            // <LSUGRADES> If it's time to repeat the headers, merge them into the grade area appropriately.
             if ($this->rowcount > 0 and $this->rowcount % $repeat == 0) {
                 $rows = array_merge($rows, $repeatentries);
             }
+	    // </LSUGRADES>
 
             if ($this->canviewhidden) {
                 $altered = array();
@@ -1013,8 +1055,10 @@ class grade_report_grader extends grade_report {
                 unset($hidingaffected);
             }
 
-
+            // <LSUGRADES> Increment the rowcount for each user so we can determine when it's time to repeat headers.
             $this->rowcount++;
+            // </LSUGRADES>
+
             $itemrow = new html_table_row();
             $itemrow->id = 'user_'.$userid;
             $itemrow->attributes['class'] = $rowclasses[$this->rowcount % 2];
@@ -1049,7 +1093,9 @@ class grade_report_grader extends grade_report {
                     $jsarguments['grades'][] = array('user'=>$userid, 'item'=>$itemid, 'grade'=>$gradevalforJS);
                 }
 
+                // <LSUGRADES> Set up anonymous grade check for future use.
                 $is_anon = isset($this->anonymous_items[$itemid]);
+                // </LSUGRADES>
 
                 // MDL-11274
                 // Hide grades in the grader report if the current grader doesn't have 'moodle/grade:viewhidden'

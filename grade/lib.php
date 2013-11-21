@@ -827,8 +827,11 @@ class grade_plugin_return {
     public $courseid;
     public $userid;
     public $page;
+
+    // <LSUGRADES> Setup for the initialbar used elsewhere in Moodle to be used in the grader report. 
     public $silast;
     public $filast;
+    // </LSUGRADES>
 
     /**
      * Constructor
@@ -842,8 +845,11 @@ class grade_plugin_return {
             $this->courseid = optional_param('gpr_courseid', null, PARAM_INT);
             $this->userid   = optional_param('gpr_userid', null, PARAM_INT);
             $this->page     = optional_param('gpr_page', null, PARAM_INT);
+
+	    // <LSUGRADES> More setup for the initialbar used elsewhere in Moodle to be used in the grader report.
             $this->silast      = optional_param('gpr_silast', null, PARAM_ALPHAEXT);
             $this->filast    = optional_param('gpr_filast', null, PARAM_ALPHAEXT);
+	    // </LSUGRADES>
 
         } else {
             foreach ($params as $key=>$value) {
@@ -881,6 +887,7 @@ class grade_plugin_return {
             $params['page'] = $this->page;
         }
 
+	// <LSUGRADES> Set the params for future use when people select an initial.
         if (!empty($this->silast)) {
             $params['silast'] = $this->silast;
         }
@@ -888,6 +895,7 @@ class grade_plugin_return {
         if (!empty($this->filast)) {
             $params['filast'] = $this->filast;
         }
+	// </LSUGRADES>
 
         return $params;
     }
@@ -924,7 +932,8 @@ class grade_plugin_return {
             $url .= $glue.'page='.$this->page;
             $glue = '&amp;';
         }
-
+ 
+	// <LSUGRADES> Construct the return url with these $extras as appropriate.
         if (!empty($this->silast)) {
             $url .= $glue.'silast='.$this->silast;
             $glue = '&amp;';
@@ -934,6 +943,7 @@ class grade_plugin_return {
             $url .= $glue.'filast='.$this->filast;
             $glue = '&amp;';
         }
+	// </LSUGRADES>
 
         if (!empty($extras)) {
             foreach ($extras as $key=>$value) {
@@ -972,6 +982,7 @@ class grade_plugin_return {
             $result .= '<input type="hidden" name="gpr_page" value="'.$this->page.'" />';
         }
 
+	// <LSUGRADES> Set the appropriate hidden return tracking form elements for the initialbar.
         if (!empty($this->silast)) {
             $result .= '<input type="hidden" name="gpr_silast" value="'.$this->silast.'" />';
         }
@@ -979,6 +990,8 @@ class grade_plugin_return {
         if (!empty($this->filast)) {
             $result .= '<input type="hidden" name="gpr_filast" value="'.$this->filast.'" />';
         }
+	// </LSUGRADES>
+
     }
 
     /**
@@ -1016,6 +1029,7 @@ class grade_plugin_return {
             $mform->setType('gpr_page', PARAM_INT);
         }
 
+	// <LSUGRADES> Add the hidden form elements into the mform when the initialbar is in use.
         if (!empty($this->silast)) {
             $mform->addElement('hidden', 'gpr_silast', $this->silast);
             $mform->setType('gpr_silast', PARAM_ALPHAEXT);
@@ -1025,6 +1039,8 @@ class grade_plugin_return {
             $mform->addElement('hidden', 'gpr_filast', $this->filast);
             $mform->setType('gpr_filast', PARAM_ALPHAEXT);
         }
+	// </LSUGRADES>
+
     }
 
     /**
@@ -1057,6 +1073,7 @@ class grade_plugin_return {
             $url->param('gpr_page', $this->page);
         }
 
+	// <LSUGRADES> Add the appropriate return tracking params into the $url.
         if (!empty($this->silast)) {
             $url->param('gpr_silast', $this->silast);
         }
@@ -1064,6 +1081,7 @@ class grade_plugin_return {
         if (!empty($this->filast)) {
             $url->param('gpr_filast', $this->filast);
         }
+	// </LSUGRADES>
 
         return $url;
     }
