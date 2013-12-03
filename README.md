@@ -24,6 +24,10 @@ Weighted Mean Extra Credit
 -
 1. Simple as it sounds. Now you can add extra credit items to Weighted Mean categories.
 
+Repeat Headers
+-
+1. Users can choose to repeat column headers that show category and item information every N rows in the grader report. This limits the need for complex javascript solutions and makes the gradebook much more usable.
+
 Anonymous Grading
 -
 1. Choose course categories of a single category to limit its use.
