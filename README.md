@@ -7,6 +7,7 @@ Additional features included in this release
 Gradebook
 -
 1. Extra Credit in Weighted Mean.
+1. Repeat headers every N rows in grader report.
 2. Optional anonymous grading allows faculty to manually grade items in an anonymous manner.
 2. Quick Edit allows for faculty to edit a single item or student quickly and easilty while allowing for bulk grading.
 3. Gradebook Builder is for those who fear the complexity of the Moodle gradebook. Think of it as a quick-start.
@@ -63,3 +64,5 @@ Grader Report
 1. Optional Quick Edit integration.
 2. Optional weighted percents show an items weight relative to its parent category.
 3. Optional Repeat Headers allows for faculty to repeat the grader report headers every x rows for easy foolproof navigation and grading.
+4. Initial Bar support for simple filtering of users based on first and last names.
+5. Let users know when an item is overridden by mimicking the excluded behavior instead displaying "overridden" in the appropriate cell.
