@@ -157,3 +157,24 @@
 [submodule "theme/lsu"]
 	path = theme/lsu
 	url = git@github.com:lsuits/lsu_theme.git
+[submodule "filter/kaltura"]
+	path = filter/kaltura
+	url = git@bitbucket.org:rrusso/filter_kaltura.git
+[submodule "local/kaltura"]
+	path = local/kaltura
+	url = git@bitbucket.org:rrusso/local_kaltura.git
+[submodule "mod/kalvidassign"]
+	path = mod/kalvidassign
+	url = git@bitbucket.org:rrusso/mod_kalvidassign.git
+[submodule "mod/kalvidpres"]
+	path = mod/kalvidpres
+	url = git@bitbucket.org:rrusso/mod_kalvidpres.git
+[submodule "mod/kalvidres"]
+	path = mod/kalvidres
+	url = git@bitbucket.org:rrusso/mod_kalvidres.git
+[submodule "repository/kaltura"]
+	path = repository/kaltura
+	url = git@bitbucket.org:rrusso/repository_kaltura.git
+[submodule "repository/kaltura_uploader"]
+	path = repository/kaltura_uploader
+	url = git@bitbucket.org:rrusso/repository_kaltura_uploader.git
