@@ -178,3 +178,6 @@
 [submodule "repository/kaltura_uploader"]
 	path = repository/kaltura_uploader
 	url = git@bitbucket.org:rrusso/repository_kaltura_uploader.git
+[submodule "local/mymedia"]
+	path = local/mymedia
+	url = git@bitbucket.org:rrusso/local_mymedia.git
