@@ -1890,7 +1890,7 @@ function course_get_cm_edit_actions(cm_info $mod, $indent = -1, $sr = null) {
     // Duplicate (require both target import caps to be able to duplicate and backup2 support, see modduplicate.php)
     // note that restoring on front page is never allowed
     if ($mod->course != SITEID && has_all_capabilities($dupecaps, $coursecontext) &&
-            plugin_supports('mod', $mod->modname, FEATURE_BACKUP_MOODLE2)) {
+            plugin_supports('mod', $mod->modname, FEATURE_BACKUP_MOODLE2) && ($mod->modname != 'turnitintool')) {
         $actions['duplicate'] = new action_link(
             new moodle_url($baseurl, array('duplicate' => $mod->id)),
             new pix_icon('t/copy', $str->duplicate, 'moodle', array('class' => 'iconsmall', 'title' => '')),
