@@ -151,9 +151,6 @@
 [submodule "question/type/oumultiresponse"]
 	path = question/type/oumultiresponse
 	url = https://github.com/moodleou/moodle-qtype_oumultiresponse.git
-[submodule "blocks/csv_enrol"]
-	path = blocks/csv_enrol
-	url = git@bitbucket.org:jpeak5/csv_enrol.git
 [submodule "theme/lsu"]
 	path = theme/lsu
 	url = git@github.com:lsuits/lsu_theme.git
@@ -181,3 +178,6 @@
 [submodule "local/mymedia"]
 	path = local/mymedia
 	url = git@bitbucket.org:rrusso/local_mymedia.git
+[submodule "blocks/csv_enrol"]
+	path = blocks/csv_enrol
+	url = https://bitbucket.org/tedvdb/csv_enrol.git
