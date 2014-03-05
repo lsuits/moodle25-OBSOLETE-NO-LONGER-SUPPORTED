@@ -315,6 +315,10 @@ class user_picture implements renderable {
 
         $is_self = $USER->id == $this->user->id;
 
+        if (isset($this->courseid) && $this->courseid != $page->course->id) {
+            $page->course->id = $this->courseid;
+        }
+
         $cc = $page->course->id == SITEID ?
             get_context_instance(CONTEXT_SYSTEM) :
             get_context_instance(CONTEXT_COURSE, $page->course->id);
