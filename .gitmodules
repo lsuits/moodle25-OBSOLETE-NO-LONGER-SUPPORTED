@@ -109,9 +109,6 @@
 [submodule "local/lsu"]
 	path = local/lsu
 	url = git@github.com:lsuits/ues_lsu_enrollment.git
-[submodule "local/mr"]
-	path = local/mr
-	url = git@github.com:lsuits/mr.git
 [submodule "local/online"]
 	path = local/online
 	url = git@github.com:lsuits/online.git
