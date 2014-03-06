@@ -887,6 +887,18 @@ ORDER BY
      * @param number $newmaxmark the new max mark to set.
      */
     public function set_max_mark_in_attempts(qubaid_condition $qubaids, $slot, $newmaxmark) {
+        // Mark Nielsen hack notes: this is only ever called from one place, but put in
+        // checks for what we expected at the time of writing this.
+        if ($this->db->get_dbfamily() === 'mysql' && $qubaids instanceof qubaid_join) {
+            $this->db->execute("
+                UPDATE {question_attempts} qa
+                  JOIN {$qubaids->from} ON $qubaids->usageidcolumn = qa.questionusageid
+                   SET qa.maxmark = :newmaxmark
+                 WHERE {$qubaids->where()}
+                   AND qa.slot = :slot
+            ", $qubaids->from_where_params() + array('newmaxmark' => $newmaxmark, 'slot' => $slot));
+            return;
+        }
         $this->db->set_field_select('question_attempts', 'maxmark', $newmaxmark,
                 "questionusageid {$qubaids->usage_id_in()} AND slot = :slot",
                 $qubaids->usage_id_in_params() + array('slot' => $slot));
