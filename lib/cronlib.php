@@ -29,6 +29,23 @@
 function cron_run() {
     global $DB, $CFG, $OUTPUT;
 
+    require_once($CFG->dirroot.'/local/mr/framework/lock.php');
+    $redis = new Redis();
+    $redis->connect($CFG->local_mr_redis_server);
+    try {
+        $redis->ping();
+    } catch (Exception $redise) { }
+    if(isset($redise)) {
+        mtrace("You do not seem to be running Redis\n\n");
+        die;
+    } else {
+        $mrlock = new mr_lock('admin_cron');
+        if (!$mrlock->get()) {
+            mtrace('Cron is currently running');
+            die;
+        }
+    }
+
     if (CLI_MAINTENANCE) {
         echo "CLI maintenance mode active, cron execution suspended.\n";
         exit(1);
@@ -61,6 +78,24 @@ function cron_run() {
 
     // Start output log
     $timenow  = time();
+/*
+    require_once($CFG->dirroot.'/local/mr/framework/lock.php');
+    $redis = new Redis();
+    $redis->connect($CFG->local_mr_redis_server);
+    try {
+        $redis->ping();
+    } catch (Exception $redise) { }
+    if(isset($redise)) {
+        mtrace("You do not seem to be running Redis\n\n");
+        die;
+    } else {
+        $mrlock = new mr_lock('admin_cron');
+        if (!$mrlock->get()) {
+            mtrace('Cron is currently running');
+            die;
+        }
+    }
+*/
     mtrace("Server Time: ".date('r', $timenow)."\n\n");
 
     // Delete old logs to save space via a timer
@@ -542,6 +577,9 @@ function cron_run() {
     mtrace('Cron completed at ' . date('H:i:s') . '. Memory used ' . display_size(memory_get_usage()) . '.');
     $difftime = microtime_diff($starttime, microtime());
     mtrace("Execution took ".$difftime." seconds");
+    if (!isset($redise)) {
+        $mrlock->release();
+    }
 }
 
 /**
