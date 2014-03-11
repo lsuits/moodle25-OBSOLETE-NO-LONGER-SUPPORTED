@@ -178,3 +178,12 @@
 [submodule "local/mymedia"]
 	path = local/mymedia
 	url = git@bitbucket.org:rrusso/local_mymedia.git
+[submodule "cache/stores/redis"]
+	path = cache/stores/redis
+	url = https://github.com/moodlerooms/moodle-cachestore_redis.git
+[submodule "local/mr"]
+	path = local/mr
+	url = https://github.com/moodlerooms/moodle-local_mr.git
+[submodule "blocks/signinsheet"]
+	path = blocks/signinsheet
+	url = git@github.com:lsuits/signinsheet.git
