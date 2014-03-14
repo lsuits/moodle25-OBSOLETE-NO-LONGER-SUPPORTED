@@ -78,24 +78,6 @@ function cron_run() {
 
     // Start output log
     $timenow  = time();
-/*
-    require_once($CFG->dirroot.'/local/mr/framework/lock.php');
-    $redis = new Redis();
-    $redis->connect($CFG->local_mr_redis_server);
-    try {
-        $redis->ping();
-    } catch (Exception $redise) { }
-    if(isset($redise)) {
-        mtrace("You do not seem to be running Redis\n\n");
-        die;
-    } else {
-        $mrlock = new mr_lock('admin_cron');
-        if (!$mrlock->get()) {
-            mtrace('Cron is currently running');
-            die;
-        }
-    }
-*/
     mtrace("Server Time: ".date('r', $timenow)."\n\n");
 
     // Delete old logs to save space via a timer
