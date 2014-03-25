@@ -43,9 +43,6 @@
 [submodule "blocks/quickmail"]
 	path = blocks/quickmail
 	url = git@github.com:lsuits/quickmail.git
-[submodule "blocks/rollsheets"]
-	path = blocks/rollsheets
-	url = git@github.com:lsuits/rollsheets.git
 [submodule "blocks/sentinel"]
 	path = blocks/sentinel
 	url = git@github.com:lsuits/block_sentinel.git
