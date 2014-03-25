@@ -187,3 +187,9 @@
 [submodule "blocks/signinsheet"]
 	path = blocks/signinsheet
 	url = git@github.com:lsuits/signinsheet.git
+[submodule "rollsheet"]
+	path = rollsheet
+	url = ./blocks/rollsheet/
+[submodule "blocks/rollsheet"]
+	path = blocks/rollsheet
+	url = git@github.com:lsuits/rollsheet.git
